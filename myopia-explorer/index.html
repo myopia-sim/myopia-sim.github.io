@@ -1,0 +1,2044 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>How Myopia Blurs Vision</title>
+<meta name="description" content="An interactive, simplified model of how myopia blurs distant vision, with guided examples, optional calculations and a summary of research on why myopia develops. For learning only; not a diagnosis or prescription.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%23243446'/%3E%3Ccircle cx='16' cy='16' r='5' fill='%23f2b33d'/%3E%3C/svg%3E">
+<style>body{margin:0}[hidden]:not([hidden=until-found i]){display:none!important}</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<style>
+/* Layout: the eye fills the left; a narrow right column holds the guide, then what the eye sees, then the dioptre box, each appearing when the guide reaches it. The maths stays folded away underneath. Everything sits on grey. */
+:root{
+  --font:"Atkinson Hyperlegible Next","Atkinson Hyperlegible","Verdana","Segoe UI",system-ui,sans-serif;
+  --display:"Bricolage Grotesque","Atkinson Hyperlegible Next","Trebuchet MS","Segoe UI",system-ui,sans-serif;
+
+  --bg:oklch(0.855 0.009 250);
+  --surface:oklch(0.895 0.008 250);
+  --stage:oklch(0.805 0.011 250);
+  --paper:oklch(0.94 0.006 250);
+  --fg:oklch(0.21 0.014 250);
+  --muted:oklch(0.36 0.016 250);
+  --line:oklch(0.775 0.012 250);
+  --line-strong:oklch(0.65 0.014 250);
+  --shadow:oklch(0.25 0.02 250 / 0.28);
+  --on-c:oklch(1 0 0);
+  --guide-bg:oklch(0.27 0.02 250);
+  --guide-fg:oklch(0.97 0.005 250);
+  --guide-muted:oklch(0.8 0.012 250);
+
+  /* warm lamp light */
+  --ray-core:oklch(0.64 0.17 62);
+  --ray-glow:oklch(0.88 0.17 90);
+  --ray-hot:oklch(0.99 0.06 100);
+
+  /* one colour per thing you can change */
+  --c1:oklch(0.48 0.2 350);    /* U1: incoming light (pink) */
+  --c2:oklch(0.44 0.17 258);   /* P1, V1: glasses (blue) */
+  --c3:oklch(0.42 0.13 150);   /* gap, U2 (green) */
+  --c4:oklch(0.5 0.15 48);     /* P2: the eye's power (orange) */
+  --c5:oklch(0.42 0.1 215);    /* V2, d: where it focuses (cyan) */
+
+  /* anatomy */
+  --scl-1:oklch(0.985 0.003 90); --scl-2:oklch(0.84 0.01 80);
+  --choroid:oklch(0.4 0.09 25);
+  --retina:oklch(0.72 0.12 45);
+  --macula:oklch(0.8 0.15 95);
+  --nerve:oklch(0.9 0.05 92); --sheath:oklch(0.76 0.016 80); --vessel:oklch(0.48 0.14 25);
+  --muscle:oklch(0.64 0.11 18); --muscle-line:oklch(0.46 0.1 18);
+  --zonule:oklch(0.42 0.03 250);
+  --iris:oklch(0.48 0.08 245); --iris-back:oklch(0.24 0.03 250);
+  --cornea:oklch(0.88 0.04 230 / 0.65); --cornea-edge:oklch(0.5 0.07 235 / 0.85);
+  --aqueous:oklch(0.92 0.025 225 / 0.55);
+  --lens-1:oklch(0.985 0.03 95 / 0.95); --lens-2:oklch(0.87 0.075 86 / 0.7); --lens-edge:oklch(0.58 0.08 82); --nucleus:oklch(0.9 0.085 86 / 0.55);
+  --vit-1:oklch(0.95 0.018 220 / 0.96); --vit-2:oklch(0.86 0.035 228 / 0.96);
+  --vit-blob:oklch(0.72 0.07 220); --vit-line:oklch(0.5 0.08 225 / 0.42);
+  --glass-1:oklch(0.92 0.05 255 / 0.65); --glass-2:oklch(0.72 0.09 258 / 0.42);
+  --spec:oklch(1 0 0 / 0.9);
+  --axis:oklch(0.45 0.014 250 / 0.5);
+  --warn-text:oklch(0.5 0.12 65);
+
+  --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px; --s6:32px; --s7:48px;
+  --ease:cubic-bezier(0.16,1,0.3,1);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:oklch(0.225 0.012 250); --surface:oklch(0.27 0.013 250); --stage:oklch(0.185 0.012 250); --paper:oklch(0.33 0.013 250);
+    --fg:oklch(0.95 0.005 250); --muted:oklch(0.77 0.012 250);
+    --line:oklch(0.35 0.014 250); --line-strong:oklch(0.47 0.016 250); --shadow:oklch(0 0 0 / 0.55); --on-c:oklch(0.17 0.01 250);
+    --guide-bg:oklch(0.91 0.008 250); --guide-fg:oklch(0.2 0.012 250); --guide-muted:oklch(0.4 0.014 250);
+    --ray-core:oklch(0.8 0.16 75); --ray-glow:oklch(0.8 0.17 70); --ray-hot:oklch(0.98 0.07 100);
+    --c1:oklch(0.76 0.17 350); --c2:oklch(0.74 0.13 255); --c3:oklch(0.78 0.16 150); --c4:oklch(0.8 0.14 60); --c5:oklch(0.8 0.11 212);
+    --scl-1:oklch(0.8 0.008 85); --scl-2:oklch(0.48 0.01 80);
+    --choroid:oklch(0.4 0.1 25); --retina:oklch(0.7 0.13 45); --macula:oklch(0.82 0.15 95);
+    --nerve:oklch(0.72 0.06 92); --sheath:oklch(0.5 0.014 80); --vessel:oklch(0.55 0.15 25);
+    --muscle:oklch(0.6 0.11 18); --muscle-line:oklch(0.42 0.1 18); --zonule:oklch(0.74 0.03 250);
+    --iris:oklch(0.62 0.09 245); --iris-back:oklch(0.14 0.02 250);
+    --cornea:oklch(0.75 0.06 230 / 0.4); --cornea-edge:oklch(0.8 0.07 232 / 0.8); --aqueous:oklch(0.5 0.05 225 / 0.3);
+    --lens-1:oklch(0.88 0.07 90 / 0.5); --lens-2:oklch(0.62 0.09 80 / 0.3); --lens-edge:oklch(0.8 0.08 88); --nucleus:oklch(0.78 0.1 86 / 0.3);
+    --vit-1:oklch(0.35 0.035 232 / 0.65); --vit-2:oklch(0.23 0.03 245 / 0.85);
+    --vit-blob:oklch(0.6 0.09 215); --vit-line:oklch(0.78 0.08 215 / 0.34);
+    --glass-1:oklch(0.72 0.09 255 / 0.3); --glass-2:oklch(0.5 0.09 258 / 0.2);
+    --spec:oklch(1 0 0 / 0.55); --axis:oklch(0.72 0.012 250 / 0.35); --warn-text:oklch(0.82 0.13 75);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:oklch(0.225 0.012 250); --surface:oklch(0.27 0.013 250); --stage:oklch(0.185 0.012 250); --paper:oklch(0.33 0.013 250);
+  --fg:oklch(0.95 0.005 250); --muted:oklch(0.77 0.012 250);
+  --line:oklch(0.35 0.014 250); --line-strong:oklch(0.47 0.016 250); --shadow:oklch(0 0 0 / 0.55); --on-c:oklch(0.17 0.01 250);
+  --guide-bg:oklch(0.91 0.008 250); --guide-fg:oklch(0.2 0.012 250); --guide-muted:oklch(0.4 0.014 250);
+  --ray-core:oklch(0.8 0.16 75); --ray-glow:oklch(0.8 0.17 70); --ray-hot:oklch(0.98 0.07 100);
+  --c1:oklch(0.76 0.17 350); --c2:oklch(0.74 0.13 255); --c3:oklch(0.78 0.16 150); --c4:oklch(0.8 0.14 60); --c5:oklch(0.8 0.11 212);
+  --scl-1:oklch(0.8 0.008 85); --scl-2:oklch(0.48 0.01 80);
+  --choroid:oklch(0.4 0.1 25); --retina:oklch(0.7 0.13 45); --macula:oklch(0.82 0.15 95);
+  --nerve:oklch(0.72 0.06 92); --sheath:oklch(0.5 0.014 80); --vessel:oklch(0.55 0.15 25);
+  --muscle:oklch(0.6 0.11 18); --muscle-line:oklch(0.42 0.1 18); --zonule:oklch(0.74 0.03 250);
+  --iris:oklch(0.62 0.09 245); --iris-back:oklch(0.14 0.02 250);
+  --cornea:oklch(0.75 0.06 230 / 0.4); --cornea-edge:oklch(0.8 0.07 232 / 0.8); --aqueous:oklch(0.5 0.05 225 / 0.3);
+  --lens-1:oklch(0.88 0.07 90 / 0.5); --lens-2:oklch(0.62 0.09 80 / 0.3); --lens-edge:oklch(0.8 0.08 88); --nucleus:oklch(0.78 0.1 86 / 0.3);
+  --vit-1:oklch(0.35 0.035 232 / 0.65); --vit-2:oklch(0.23 0.03 245 / 0.85);
+  --vit-blob:oklch(0.6 0.09 215); --vit-line:oklch(0.78 0.08 215 / 0.34);
+  --glass-1:oklch(0.72 0.09 255 / 0.3); --glass-2:oklch(0.5 0.09 258 / 0.2);
+  --spec:oklch(1 0 0 / 0.55); --axis:oklch(0.72 0.012 250 / 0.35); --warn-text:oklch(0.82 0.13 75);
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{scrollbar-color:var(--line-strong) transparent}
+body{margin:0; background:var(--bg); color:var(--fg); font-family:var(--font); font-size:1rem; line-height:1.5; -webkit-font-smoothing:antialiased}
+::selection{background:color-mix(in oklch,var(--c2) 30%,transparent); color:var(--fg)}
+:focus-visible{outline:2px solid var(--fg); outline-offset:3px; border-radius:6px}
+a{color:inherit; text-underline-offset:3px; text-decoration-thickness:1px}
+a:hover{text-decoration-thickness:2px}
+
+.page{max-width:1600px; margin-inline:auto; padding-inline:clamp(16px,2.5vw,32px); padding-block:var(--s5) var(--s7)}
+h1{font-family:var(--display); font-size:clamp(1.875rem,3.4vw,2.75rem); font-weight:600; letter-spacing:-0.035em; line-height:1; margin:0 0 var(--s4)}
+h2{font-family:var(--display); font-size:1.25rem; font-weight:600; letter-spacing:-0.02em; line-height:1.15; margin:0; text-wrap:balance}
+
+.chip{
+  font:inherit; font-size:0.875rem; font-weight:600; color:var(--fg); cursor:pointer;
+  padding:6px 12px; min-height:34px; border-radius:8px; border:1px solid var(--line-strong); background:transparent;
+  transition:background-color 160ms var(--ease), color 160ms var(--ease), border-color 160ms var(--ease), opacity 200ms var(--ease);
+}
+.chip:hover:not(:disabled){background:color-mix(in oklch,var(--fg) 9%,transparent)}
+.chip[aria-pressed="true"]{background:var(--fg); border-color:var(--fg); color:var(--surface)}
+.chip[aria-pressed="true"]:hover:not(:disabled){background:color-mix(in oklch,var(--fg) 86%,var(--surface))}
+.chip:disabled, .fix:disabled{opacity:0.35; cursor:default}
+
+.layout{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,340px); column-gap:var(--s4);
+  grid-template-areas:"bench guide" "bench sees" "bench cmp" "bench dio" "bench ."; grid-template-rows:auto auto auto auto 1fr}
+.bench{grid-area:bench} .guide{grid-area:guide} .sees{grid-area:sees} .diocard{grid-area:dio}
+.guide, .sees, .diocard{margin-bottom:var(--s4)}
+#fGap, #gapNote, #row2, #row3{display:none !important}
+
+/* ---------- guide ---------- */
+.guide{background:var(--guide-bg); color:var(--guide-fg); border-radius:16px; padding:var(--s4); display:grid; gap:var(--s3); box-shadow:0 10px 24px -14px var(--shadow)}
+.guide-main{min-width:0; display:grid; gap:var(--s1)}
+.guide-count{font-size:0.8125rem; font-weight:600; color:var(--guide-muted)}
+.guide h2{font-size:1.375rem; color:var(--guide-fg)}
+.guide p{margin:0}
+.guide-do{display:flex; align-items:flex-start; gap:var(--s2); font-weight:600; margin-top:var(--s1)}
+.guide-do svg{width:20px; height:20px; flex:none; margin-top:2px; fill:none; stroke:currentColor; stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round}
+.guide-nav{display:flex; align-items:center; gap:var(--s2)}
+.guide-nav .spacer{flex:1}
+.gbtn{
+  font:inherit; font-weight:600; cursor:pointer; min-height:40px; padding:8px 16px; border-radius:8px;
+  border:1px solid color-mix(in oklch,var(--guide-fg) 40%,transparent); background:transparent; color:var(--guide-fg);
+  transition:background-color 160ms var(--ease), transform 120ms var(--ease), opacity 200ms var(--ease);
+}
+.gbtn:hover:not(:disabled){background:color-mix(in oklch,var(--guide-fg) 12%,transparent)}
+.gbtn:active:not(:disabled){transform:translateY(1px)}
+.gbtn.primary{background:var(--guide-fg); color:var(--guide-bg); border-color:var(--guide-fg)}
+.gbtn.primary:hover:not(:disabled){background:color-mix(in oklch,var(--guide-fg) 86%,var(--guide-bg))}
+.gbtn:disabled{opacity:0.35; cursor:default}
+.gbtn.quiet{border-color:transparent; font-weight:600; color:var(--guide-muted); padding-inline:4px}
+.guide :focus-visible{outline-color:var(--guide-fg)}
+.bar{height:3px; border-radius:2px; background:color-mix(in oklch,var(--guide-fg) 18%,transparent); overflow:hidden}
+.bar i{display:block; height:100%; width:10%; background:var(--guide-fg); border-radius:2px; transition:width 320ms var(--ease)}
+.is-target{outline:2.5px solid var(--fg); outline-offset:5px}
+.guide .is-target{outline-color:var(--guide-fg)}
+@media (prefers-reduced-motion: no-preference){ .is-target{animation:ring 1.2s ease-in-out infinite} }
+@keyframes ring{50%{outline-offset:11px}}
+
+/* ---------- bench ---------- */
+.bench{margin:0; min-width:0; background:var(--stage); border:1px solid var(--line); border-radius:16px; overflow:hidden; align-self:start}
+.bench-bar{display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:var(--s2) var(--s4); padding:var(--s3) var(--s4); min-height:59px}
+.group{display:flex; flex-wrap:wrap; align-items:center; gap:var(--s2)}
+.group-label{font-size:0.875rem; color:var(--muted); margin-right:var(--s1)}
+.bench-scroll{overflow-x:auto; overscroll-behavior-x:contain}
+#bench{display:block; width:100%; min-width:680px; height:auto}
+
+.fields{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:var(--s3) var(--s5); padding:var(--s3) var(--s4) var(--s4); background:var(--surface); border-top:1px solid var(--line)}
+.fields:not(:has(.field:not([hidden]))){display:none}
+.field{display:grid; gap:0; min-width:0; border-radius:10px; transition:opacity 200ms var(--ease)}
+.field.is-locked{opacity:0.35}
+.field-head{display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between; gap:0 var(--s2)}
+.field label{font-size:0.9375rem; font-weight:600; display:flex; align-items:center; gap:6px; white-space:nowrap}
+.field label::before{content:""; width:9px; height:9px; border-radius:50%; background:var(--c); flex:none}
+.field output{font-family:var(--display); font-variant-numeric:tabular-nums lining-nums; font-size:0.9375rem; font-weight:600; white-space:nowrap}
+.range{
+  -webkit-appearance:none; appearance:none; width:100%; height:30px; margin:0; background:transparent; cursor:pointer;
+  --track:linear-gradient(to right,var(--line-strong) var(--a,0%),var(--c) var(--a,0%),var(--c) var(--b,50%),var(--line-strong) var(--b,50%));
+}
+.range:disabled{cursor:default}
+.range:focus-visible{outline:none}
+.range::-webkit-slider-runnable-track{height:4px; border-radius:2px; background:var(--track)}
+.range::-moz-range-track{height:4px; border-radius:2px; background:var(--track)}
+.range::-webkit-slider-thumb{
+  -webkit-appearance:none; appearance:none; width:20px; height:20px; margin-top:-8px; border-radius:50%;
+  background:var(--c); border:3px solid var(--surface); box-shadow:0 0 0 1px var(--c), 0 2px 6px -1px var(--shadow);
+  transition:transform 140ms var(--ease);
+}
+.range::-moz-range-thumb{width:14px; height:14px; border-radius:50%; background:var(--c); border:3px solid var(--surface); box-shadow:0 0 0 1px var(--c), 0 2px 6px -1px var(--shadow)}
+.range:hover:not(:disabled)::-webkit-slider-thumb{transform:scale(1.12)}
+.range:focus-visible::-webkit-slider-thumb{outline:2px solid var(--fg); outline-offset:3px}
+.range:focus-visible::-moz-range-thumb{outline:2px solid var(--fg); outline-offset:3px}
+
+/* SVG paint */
+.g-vit1{stop-color:var(--vit-1)} .g-vit2{stop-color:var(--vit-2)}
+.g-scl1{stop-color:var(--scl-1)} .g-scl2{stop-color:var(--scl-2)}
+.g-len1{stop-color:var(--lens-1)} .g-len2{stop-color:var(--lens-2)}
+.g-gls1{stop-color:var(--glass-1)} .g-gls2{stop-color:var(--glass-2)}
+.g-blob1{stop-color:var(--vit-blob); stop-opacity:0.42} .g-blob2{stop-color:var(--vit-blob); stop-opacity:0}
+#axis{stroke:var(--axis); stroke-width:1; stroke-dasharray:2 7; stroke-linecap:round}
+#eyeShadow{fill:var(--shadow); opacity:0.6}
+.sheath{stroke:var(--sheath); stroke-width:24; fill:none}
+.nerve{stroke:var(--nerve); stroke-width:15; fill:none}
+.vessel{stroke:var(--vessel); stroke-width:1.4; fill:none; opacity:0.75}
+#sclera{stroke:url(#gScl); stroke-width:12; stroke-linecap:round; fill:none}
+#choroid{stroke:var(--choroid); stroke-width:3; fill:none; stroke-linecap:round}
+#retina{stroke:var(--retina); stroke-width:5; fill:none; stroke-linecap:round}
+#macula{stroke:var(--macula); stroke-width:5; fill:none}
+#disc{fill:var(--nerve); stroke:var(--retina); stroke-width:1}
+#vit{fill:url(#gVit)}
+.blob{fill:url(#gBlob)}
+.current{fill:none; stroke:var(--vit-line); stroke-width:1.2; stroke-linecap:round; stroke-linejoin:round; stroke-dasharray:110 50; opacity:0.7; vector-effect:non-scaling-stroke}
+.floater{fill:var(--vit-line)}
+.cil{fill:var(--muscle); stroke:var(--muscle); stroke-width:3; stroke-linejoin:round}
+.cil-fib{stroke:var(--muscle-line); stroke-width:1; fill:none; opacity:0.7; stroke-linecap:round}
+#zon path{stroke:var(--zonule); stroke-width:0.9; stroke-linecap:round; fill:none; opacity:0.9}
+#aq{fill:var(--aqueous)}
+#cornea{stroke:var(--cornea); stroke-width:8; stroke-linecap:round; fill:none}
+.cornea-edge{stroke:var(--cornea-edge); stroke-width:1; fill:none; stroke-linecap:round}
+.iris{fill:var(--iris); stroke:var(--iris); stroke-width:2; stroke-linejoin:round}
+.iris-back{stroke:var(--iris-back); stroke-width:1.6; stroke-linecap:round; fill:none}
+#clens{fill:url(#gLens); stroke:var(--lens-edge); stroke-width:1.2}
+#lamella{fill:none; stroke:var(--lens-edge); stroke-width:0.8; opacity:0.45}
+#nucleus{fill:var(--nucleus)}
+#glasses{fill:url(#gGlass); stroke:var(--c2); stroke-width:1.4; stroke-linejoin:round}
+.hi{stroke:var(--spec); stroke-width:1.6; stroke-linecap:round; fill:none}
+#back{stroke:var(--c3); stroke-width:1.2; stroke-dasharray:3 6; stroke-linecap:round; fill:none; opacity:0.8}
+#virt{stroke:var(--ray-core); stroke-width:1; stroke-dasharray:3 6; stroke-linecap:round; fill:none; opacity:0.6}
+.glow path{stroke:var(--ray-glow); stroke-width:8; fill:none; opacity:0.5; stroke-linejoin:round}
+#dioGlow path{stroke-width:6; opacity:0.3}
+.core path{stroke:var(--ray-core); stroke-width:1.4; fill:none; opacity:0.9; stroke-linejoin:round}
+.stream path{stroke:var(--ray-hot); stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round; fill:none; stroke-dasharray:14 12}
+#spot{stroke:var(--ray-core); stroke-width:6; stroke-linecap:round; stroke-linejoin:round; fill:none}
+#fdot{fill:var(--paper); stroke:var(--c5); stroke-width:2.5}
+#srcDot{fill:var(--c3); stroke:var(--stage); stroke-width:2}
+#objDot{fill:var(--ray-core); stroke:var(--stage); stroke-width:2}
+#bench text, #dioSvg text{font-family:var(--font); font-variant-numeric:tabular-nums lining-nums}
+.lab{font-size:14px; font-weight:600; fill:var(--fg)}
+.sub{font-size:13px; fill:var(--muted)}
+.eq{font-family:var(--display) !important; font-size:15px; font-weight:600; fill:var(--fg)}
+.eq-arrow{stroke:var(--muted); stroke-width:1.6; fill:none; stroke-linecap:round; stroke-linejoin:round}
+.pill rect{fill:var(--c)}
+.pill text{font-size:13px; font-weight:600; fill:var(--on-c)}
+.pill line{stroke:var(--c); stroke-width:1.2; stroke-dasharray:2 4; stroke-linecap:round; opacity:0.8}
+#gapTxt{font-size:13px; font-weight:600; fill:var(--c3)}
+.dim{stroke-width:2; stroke-linecap:round; fill:none}
+#dimF{stroke:var(--c5)} #dimR{stroke:var(--muted)} #dim0{stroke:var(--muted); stroke-width:1}
+#tDimF{font-size:13.5px; font-weight:600; fill:var(--c5)}
+#tDimR{font-size:13.5px; fill:var(--muted)}
+#parts text{font-size:13px; font-weight:600; fill:var(--fg); paint-order:stroke; stroke:var(--stage); stroke-width:3.5px; stroke-linejoin:round}
+#parts line{stroke:var(--fg); stroke-width:0.9; opacity:0.6}
+#parts circle{fill:var(--fg)}
+#bench.no-parts #parts, #bench.no-nums #strip, #bench.no-nums #rulers, #bench.no-glasses .gl, #bench.no-gap .gp{display:none}
+
+@keyframes flow{to{stroke-dashoffset:-26}}
+@keyframes flow2{to{stroke-dashoffset:-160}}
+@keyframes draw{from{stroke-dasharray:1; stroke-dashoffset:1} to{stroke-dasharray:1; stroke-dashoffset:0}}
+@keyframes drift{from{transform:translate(var(--x0),var(--y0))} to{transform:translate(var(--x1),var(--y1))}}
+.stream path{animation:flow 0.7s linear infinite}
+.current{animation:flow2 var(--d,6s) linear infinite}
+@media (prefers-reduced-motion: no-preference){
+  .core path{animation:draw 900ms var(--ease) backwards}
+  .blob, .floater{animation:drift var(--d,12s) ease-in-out infinite alternate}
+}
+@media (prefers-reduced-motion: reduce){
+  .stream path{animation-duration:2.6s}
+  .current{animation-duration:40s}
+}
+.is-paused .stream path, .is-paused .current, .is-paused .blob, .is-paused .floater{animation-play-state:paused}
+
+/* ---------- equations under the eye ---------- */
+.eqs{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:var(--s4) var(--s5); padding:var(--s4); background:var(--surface); border-top:1px solid var(--line)}
+.eqs:not([hidden]) + .fields{border-top:1px solid var(--line)}
+.eq-def{grid-column:1 / -1; margin:0; font-size:0.9375rem; max-width:80ch}
+.eqc{display:grid; gap:var(--s1); align-content:start; min-width:0}
+.eq-lab{display:flex; align-items:center; gap:6px; font-size:0.8125rem; font-weight:600; color:var(--muted)}
+.eq-lab::before{content:""; width:9px; height:9px; border-radius:50%; background:var(--c); flex:none}
+.eq-line{font-family:var(--display); font-variant-numeric:tabular-nums lining-nums; font-size:1.0625rem; line-height:1.3; display:flex; flex-wrap:wrap; align-items:center; gap:0 6px}
+.eq-line strong{font-weight:600; color:var(--c)}
+.eq-var{font-size:0.8125rem; color:var(--muted)}
+.eq-var .k1, .eq-var .k4, .eq-var .k5{font-family:var(--display)}
+.k1{color:var(--c1)} .k2{color:var(--c2)} .k3{color:var(--c3)} .k4{color:var(--c4)} .k5{color:var(--c5)}
+.k1, .k2, .k3, .k4, .k5{font-weight:600}
+.rows sub{font-size:0.7em}
+.frac{display:inline-flex; flex-direction:column; align-items:center; vertical-align:middle; line-height:1.1; font-size:0.92em; margin:0 1px}
+.frac > span{padding:1px 3px}
+.frac > span:first-child{border-bottom:1.5px solid currentColor}
+@media (max-width: 720px){ .eqs{grid-template-columns:minmax(0,1fr)} }
+#eqA{fill:var(--c1)} #eqB{fill:var(--c2)} #eqC{fill:var(--c3)} #eqD{fill:var(--c5)}
+#bench.one-lens .two, #bench.no-gap .gp{display:none}
+
+/* ---------- result card ---------- */
+.card{background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:var(--s4)}
+.sees{display:grid; grid-template-columns:auto minmax(0,1fr); gap:var(--s3) var(--s4); align-items:center}
+.chart-box{width:112px; height:112px; display:grid; place-items:center; overflow:hidden; background:var(--paper); border:1px solid var(--line-strong); border-radius:10px}
+.chart-lines{display:grid; justify-items:center; gap:3px; font-family:var(--display); font-weight:600; line-height:1; color:var(--fg); transition:filter 260ms var(--ease)}
+.chart-lines span:nth-child(1){font-size:40px}
+.chart-lines span:nth-child(2){font-size:23px; letter-spacing:0.22em; margin-right:-0.22em}
+.chart-lines span:nth-child(3){font-size:13px; letter-spacing:0.3em; margin-right:-0.3em}
+.verdict{min-width:0; display:grid; gap:2px}
+.cap{font-size:0.8125rem; color:var(--muted); margin:0}
+.verdict-title{margin:0; font-family:var(--display); font-size:1.625rem; letter-spacing:-0.025em; font-weight:600; line-height:1.1}
+.verdict-body{margin:0; font-size:0.9375rem}
+.fix{
+  grid-column:1 / -1; font:inherit; font-size:0.9375rem; font-weight:600; color:var(--fg); cursor:pointer;
+  padding:10px 14px; min-height:44px; border-radius:8px; border:1px solid var(--c2);
+  background:color-mix(in oklch,var(--c2) 14%,var(--surface)); transition:background-color 160ms var(--ease), transform 120ms var(--ease), opacity 200ms var(--ease);
+}
+.fix:hover:not(:disabled){background:color-mix(in oklch,var(--c2) 24%,var(--surface))}
+.fix:active:not(:disabled){transform:translateY(1px)}
+
+/* ---------- dioptre box ---------- */
+.diocard{display:grid; gap:var(--s2)}
+.diocard p{margin:0; font-size:0.9375rem}
+#dioSvg{display:block; width:100%; height:auto; background:var(--stage); border-radius:10px}
+.dio-say{font-weight:600; min-height:3em}
+.dio-rule{font-family:var(--display); font-weight:600; font-size:1.0625rem}
+.dio-ruler line{stroke:var(--line-strong); stroke-width:1}
+.dio-ruler text{font-size:11px; fill:var(--muted)}
+#dioLens{fill:url(#gGlass); stroke:var(--c2); stroke-width:1.2; stroke-linejoin:round}
+#dioBack{stroke:var(--ray-core); stroke-width:1; stroke-dasharray:3 5; fill:none; opacity:0.7; stroke-linecap:round}
+#dioDot{fill:var(--fg); stroke:var(--stage); stroke-width:2}
+#dioDrop{stroke:var(--fg); stroke-width:1; stroke-dasharray:2 3; opacity:0.6}
+#dioLab{font-size:13px; font-weight:600; fill:var(--fg)}
+
+/* ---------- the maths, folded away ---------- */
+.adv{margin-top:var(--s4); background:var(--surface); border:1px solid var(--line); border-radius:16px}
+.adv summary{
+  display:flex; align-items:center; gap:var(--s3); padding:var(--s4); cursor:pointer; list-style:none; border-radius:16px;
+  font-family:var(--display); font-size:1.25rem; font-weight:600; letter-spacing:-0.02em;
+}
+.adv summary::-webkit-details-marker{display:none}
+.adv summary small{font-family:var(--font); font-size:0.875rem; font-weight:400; letter-spacing:0; color:var(--muted)}
+.chev{width:16px; height:16px; flex:none; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; transition:transform 220ms var(--ease)}
+.adv[open] .chev{transform:rotate(180deg)}
+.adv-body{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,300px); gap:var(--s5) var(--s6); padding:0 var(--s4) var(--s5)}
+.rows{list-style:none; margin:0; padding:0; display:grid}
+.rows li{display:grid; grid-template-columns:28px minmax(0,1fr) auto; gap:var(--s1) var(--s3); align-items:start; padding:var(--s4) 0}
+.rows li + li{border-top:1px solid var(--line)}
+.badge{width:28px; height:28px; border-radius:50%; background:var(--c); color:var(--on-c); font-family:var(--display); font-weight:600; font-size:0.9375rem; line-height:28px; text-align:center}
+.row-main{min-width:0; display:grid; gap:2px}
+.row-title{font-weight:600}
+.row-math{font-family:var(--display); font-variant-numeric:tabular-nums lining-nums; font-size:1.0625rem}
+.row-math b{color:var(--c); font-weight:600}
+.row-why{color:var(--muted); font-size:0.9375rem; max-width:62ch}
+.row-why b{color:var(--fg); font-variant-numeric:tabular-nums lining-nums}
+.row-num{font-family:var(--display); font-variant-numeric:tabular-nums lining-nums; font-size:1.5rem; font-weight:600; letter-spacing:-0.02em; line-height:1.15; white-space:nowrap; text-align:right}
+.adv-side{display:grid; gap:var(--s4); align-content:start; min-width:0}
+.adv-side p{margin:0; font-size:0.875rem; color:var(--muted)}
+
+/* ---------- tabs ---------- */
+.tabs{display:flex; flex-wrap:wrap; gap:4px; padding:4px; margin:0 0 var(--s4); background:var(--surface); border:1px solid var(--line); border-radius:12px; width:fit-content; max-width:100%}
+.tab{font:inherit; font-weight:600; font-size:0.9375rem; color:var(--muted); cursor:pointer; padding:8px 16px; min-height:40px; border:0; border-radius:8px; background:transparent; transition:background-color 160ms var(--ease), color 160ms var(--ease)}
+.tab:hover{color:var(--fg)}
+.tab[aria-selected="true"]{background:var(--fg); color:var(--surface)}
+
+/* ---------- why myopia develops ---------- */
+.why{display:grid; gap:var(--s5); max-width:1180px}
+.why:focus{outline:none}
+.why-intro{display:grid; gap:var(--s3); max-width:72ch; font-size:1.0625rem}
+.why-intro p, .why-block p{margin:0}
+.why-block{display:grid; gap:var(--s3); background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:var(--s5)}
+.why-points{margin:0; padding-left:1.2em; display:grid; gap:var(--s2); max-width:80ch}
+.why-note{color:var(--muted); font-size:0.9375rem}
+.cite{font-size:0.8125rem; color:var(--muted); white-space:nowrap; text-underline-offset:2px}
+.cite:hover{color:var(--fg)}
+.sig{margin:0; display:grid; gap:var(--s2)}
+.sig-steps{list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:var(--s5)}
+.sig-steps li{position:relative; display:grid; gap:var(--s1); align-content:start; padding:var(--s3); background:var(--paper); border:1px solid var(--line-strong); border-radius:10px; font-size:0.9375rem}
+.sig-steps li + li::before{content:""; position:absolute; left:calc(-1 * var(--s5) + 4px); top:50%; width:calc(var(--s5) - 8px); border-top:2px solid var(--muted)}
+.sig-steps li + li::after{content:""; position:absolute; left:-9px; top:calc(50% - 4px); border:5px solid transparent; border-left:6px solid var(--muted); border-right:0}
+.sig-steps li.sig-unknown{border-style:dashed; border-width:1.5px; background:transparent}
+.sig-n{font-family:var(--display); font-weight:600; font-size:1.125rem; color:var(--c5)}
+.sig figcaption{font-size:0.8125rem; color:var(--muted)}
+.tbl-wrap{overflow-x:auto}
+.why-table{width:100%; border-collapse:collapse; font-size:0.9375rem; min-width:760px}
+.why-table th, .why-table td{text-align:left; vertical-align:top; padding:var(--s3); border-top:1px solid var(--line)}
+.why-table thead th{font-family:var(--display); font-size:0.9375rem; border-top:0; border-bottom:2px solid var(--line-strong)}
+.why-table tbody th{font-family:var(--display); font-size:1rem; width:15%}
+.why-table .th-yes{color:var(--c3)} .why-table .th-no{color:var(--warn-text)}
+.why-table .td-yes{background:color-mix(in oklch,var(--c3) 7%,transparent)}
+.why-table .td-no{background:color-mix(in oklch,var(--warn-text) 8%,transparent)}
+.why-table details{margin-top:var(--s2)}
+.why-table summary{cursor:pointer; font-size:0.8125rem; font-weight:600; color:var(--muted); width:fit-content}
+.why-table details p{margin:var(--s1) 0 0; font-size:0.875rem}
+.refs{margin:0; padding-left:1.2em; display:grid; gap:var(--s2); font-size:0.875rem}
+@media (max-width: 760px){
+  .why-block{padding:var(--s4)}
+  .sig-steps{grid-template-columns:minmax(0,1fr); gap:var(--s4)}
+  .sig-steps li + li::before{left:50%; top:calc(-1 * var(--s4) + 2px); width:0; height:calc(var(--s4) - 6px); border-top:0; border-left:2px solid var(--muted)}
+  .sig-steps li + li::after{left:calc(50% - 4px); top:-9px; border:5px solid transparent; border-top:6px solid var(--muted); border-bottom:0}
+  .tbl-wrap{overflow:visible}
+  .why-table{min-width:0}
+  .why-table thead{display:none}
+  .why-table, .why-table tbody, .why-table tr, .why-table th, .why-table td{display:block; width:auto}
+  .why-table tr{border:1px solid var(--line); border-radius:12px; overflow:hidden; margin-bottom:var(--s3); background:var(--stage)}
+  .why-table tbody th{font-size:1.0625rem; border-top:0; background:var(--surface); width:auto}
+  .why-table td::before{content:attr(data-label); display:block; font-size:0.75rem; font-weight:600; color:var(--muted); margin-bottom:2px}
+  .why-table td.td-yes::before{color:var(--c3)} .why-table td.td-no::before{color:var(--warn-text)}
+}
+
+/* ---------- route selector ---------- */
+#panelSim.at-intro > :not(#intro){display:none !important}
+#panelSim:not(.at-intro) > #intro{display:none}
+.intro{display:grid; justify-items:center; padding-block:var(--s5) var(--s7)}
+.intro-card{width:100%; max-width:640px; display:grid; gap:var(--s4); background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:clamp(20px,4vw,32px)}
+.intro-card h2{font-size:1.5rem}
+.intro-card h2:focus{outline:none}
+.intro-sub, .intro-note{margin:0; color:var(--muted); font-size:0.9375rem}
+.choices{display:grid; gap:var(--s3)}
+.choice{display:grid; gap:2px; text-align:left; font:inherit; color:var(--fg); cursor:pointer; padding:var(--s4); border-radius:12px; border:1px solid var(--line-strong); background:var(--paper); transition:border-color 160ms var(--ease), background-color 160ms var(--ease), transform 120ms var(--ease)}
+.choice b{font-family:var(--display); font-size:1.125rem; font-weight:600}
+.choice span{color:var(--muted); font-size:0.9375rem}
+.choice:hover{border-color:var(--fg)}
+.choice:active{transform:translateY(1px)}
+.intro-foot{display:flex; flex-wrap:wrap; justify-content:space-between; gap:var(--s3)}
+.link-btn{font:inherit; font-weight:600; color:var(--fg); background:none; border:0; padding:6px 0; cursor:pointer; text-decoration:underline; text-underline-offset:3px; text-decoration-thickness:1px}
+.link-btn:hover{text-decoration-thickness:2px}
+.routebar{display:flex; flex-wrap:wrap; align-items:center; gap:var(--s2) var(--s3); margin-bottom:var(--s4)}
+.routebar .spacer{flex:1}
+.route-now{color:var(--muted); font-size:0.9375rem}
+.route-now b{color:var(--fg)}
+.gacts{display:flex; flex-wrap:wrap; gap:var(--s2); margin-top:var(--s2)}
+.gacts:empty{display:none}
+.g-maths{display:block; margin-top:var(--s2); padding-top:var(--s2); border-top:1px solid color-mix(in oklch,var(--guide-fg) 22%,transparent); color:var(--guide-muted); font-size:0.9375rem}
+
+/* ---------- calculations toggle and extra controls ---------- */
+.calc-bar{display:flex; flex-wrap:wrap; align-items:center; gap:var(--s2) var(--s3); padding:var(--s3) var(--s4); background:var(--surface); border-top:1px solid var(--line)}
+.calc-bar .note{color:var(--muted); font-size:0.875rem}
+.more-btn{display:block; width:100%; text-align:left; font:inherit; font-size:0.875rem; font-weight:600; color:var(--fg); cursor:pointer; padding:var(--s3) var(--s4); background:var(--surface); border:0; border-top:1px solid var(--line)}
+.more-btn:hover{text-decoration:underline; text-underline-offset:3px}
+
+/* ---------- comparison card ---------- */
+.cmp{display:grid; gap:var(--s2); grid-area:cmp; margin-bottom:var(--s4)}
+.cmp-t{width:100%; border-collapse:collapse; font-size:0.875rem}
+.cmp-t th, .cmp-t td{text-align:left; vertical-align:top; padding:6px 6px 6px 0; border-top:1px solid var(--line)}
+.cmp-t thead th{border-top:0; font-family:var(--display); font-size:0.9375rem}
+.cmp-t tbody th{color:var(--muted); font-weight:600; width:32%}
+.cmp-note{margin:0; font-size:0.8125rem; color:var(--muted)}
+
+/* ---------- why tab: compact topics ---------- */
+.why{display:grid; gap:var(--s4); max-width:860px}
+.why-lede{margin:0; font-size:1.0625rem; max-width:70ch}
+.topics{display:grid; gap:var(--s2)}
+.topic, .why-bg, .why-refs{background:var(--surface); border:1px solid var(--line); border-radius:14px}
+.topic > summary, .why-bg > summary{display:grid; grid-template-columns:minmax(0,1fr) auto; grid-template-areas:"name chev" "gist chev"; align-items:center; column-gap:var(--s3); padding:var(--s4); cursor:pointer; list-style:none; border-radius:14px}
+.topic > summary::-webkit-details-marker, .why-bg > summary::-webkit-details-marker, .why-refs > summary::-webkit-details-marker{display:none}
+.topic > summary::after, .why-bg > summary::after{content:""; grid-area:chev; width:9px; height:9px; border-right:2px solid var(--muted); border-bottom:2px solid var(--muted); transform:rotate(45deg); transition:transform 200ms var(--ease); margin-top:-4px}
+.topic[open] > summary::after, .why-bg[open] > summary::after{transform:rotate(-135deg); margin-top:4px}
+.t-name{grid-area:name; font-family:var(--display); font-weight:600; font-size:1.0625rem}
+.t-gist{grid-area:gist; color:var(--muted); font-size:0.875rem}
+.t-body{display:grid; gap:var(--s3); padding:0 var(--s4) var(--s4); font-size:0.9375rem}
+.t-body p{margin:0; max-width:68ch}
+.t-lab{display:block; font-size:0.75rem; font-weight:600; letter-spacing:0.02em; color:var(--muted); margin-bottom:2px}
+.t-yes .t-lab{color:var(--c3)} .t-no .t-lab{color:var(--warn-text)}
+.t-yes, .t-no{padding:var(--s2) var(--s3); border-radius:8px}
+.t-yes{background:color-mix(in oklch,var(--c3) 9%,transparent)}
+.t-no{background:color-mix(in oklch,var(--warn-text) 10%,transparent)}
+.why-refs > summary{padding:var(--s3) var(--s4); cursor:pointer; font-weight:600; list-style:none}
+.why-refs .refs{padding:0 var(--s4) var(--s4) calc(var(--s4) + 1.2em)}
+
+/* ---------- sources ---------- */
+.sources{margin-top:var(--s6); padding-top:var(--s4); border-top:1px solid var(--line-strong); display:grid; gap:var(--s3)}
+.sources ul{margin:0; padding:0; list-style:none; display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr)); gap:var(--s2) var(--s6)}
+.sources li{font-size:0.875rem; min-width:0}
+
+@media (max-width: 1100px){
+  .layout{grid-template-columns:minmax(0,1fr); grid-template-rows:none; grid-template-areas:"guide" "bench" "sees" "cmp" "dio"}
+  .bench{margin-bottom:var(--s4)}
+  .adv-body{grid-template-columns:minmax(0,1fr)}
+}
+.canvas{--stage:oklch(0.185 0.012 250); --paper:oklch(0.33 0.013 250); --fg:oklch(0.95 0.005 250); --muted:oklch(0.77 0.012 250); --line:oklch(0.35 0.014 250); --line-strong:oklch(0.47 0.016 250); --shadow:oklch(0 0 0 / 0.55); --on-c:oklch(0.17 0.01 250); --ray-core:oklch(0.8 0.16 75); --ray-glow:oklch(0.8 0.17 70); --ray-hot:oklch(0.98 0.07 100); --c1:oklch(0.76 0.17 350); --c2:oklch(0.74 0.13 255); --c3:oklch(0.78 0.16 150); --c4:oklch(0.8 0.14 60); --c5:oklch(0.8 0.11 212); --scl-1:oklch(0.8 0.008 85); --scl-2:oklch(0.48 0.01 80); --choroid:oklch(0.4 0.1 25); --retina:oklch(0.7 0.13 45); --macula:oklch(0.82 0.15 95); --nerve:oklch(0.72 0.06 92); --sheath:oklch(0.5 0.014 80); --vessel:oklch(0.55 0.15 25); --muscle:oklch(0.6 0.11 18); --muscle-line:oklch(0.42 0.1 18); --zonule:oklch(0.74 0.03 250); --iris:oklch(0.62 0.09 245); --iris-back:oklch(0.14 0.02 250); --cornea:oklch(0.75 0.06 230 / 0.4); --cornea-edge:oklch(0.8 0.07 232 / 0.8); --aqueous:oklch(0.5 0.05 225 / 0.3); --lens-1:oklch(0.88 0.07 90 / 0.5); --lens-2:oklch(0.62 0.09 80 / 0.3); --lens-edge:oklch(0.8 0.08 88); --nucleus:oklch(0.78 0.1 86 / 0.3); --vit-1:oklch(0.35 0.035 232 / 0.65); --vit-2:oklch(0.23 0.03 245 / 0.85); --vit-blob:oklch(0.6 0.09 215); --vit-line:oklch(0.78 0.08 215 / 0.34); --glass-1:oklch(0.72 0.09 255 / 0.3); --glass-2:oklch(0.5 0.09 258 / 0.2); --spec:oklch(1 0 0 / 0.55); --axis:oklch(0.72 0.012 250 / 0.35); --warn-text:oklch(0.82 0.13 75); --paper:oklch(0.22 0.012 250); color-scheme:dark}
+
+/* ===== Refinement: publication typography, dark instrument canvas ===== */
+:root{
+  --font:"Source Sans 3","Segoe UI",system-ui,-apple-system,sans-serif;
+  --display:"Source Serif 4",Georgia,"Times New Roman",serif;
+  --bg:oklch(0.972 0.009 85); --surface:oklch(0.985 0.007 85); --paper:oklch(0.995 0.004 85);
+  --fg:oklch(0.23 0.015 255); --muted:oklch(0.43 0.015 255);
+  --line:oklch(0.88 0.011 80); --line-strong:oklch(0.75 0.013 80);
+  --guide-bg:oklch(0.995 0.004 85); --guide-fg:oklch(0.23 0.015 255); --guide-muted:oklch(0.43 0.015 255);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:oklch(0.205 0.01 255); --surface:oklch(0.235 0.011 255); --paper:oklch(0.26 0.012 255);
+    --line:oklch(0.33 0.012 255); --line-strong:oklch(0.46 0.014 255);
+    --guide-bg:oklch(0.26 0.012 255); --guide-fg:oklch(0.95 0.005 250); --guide-muted:oklch(0.77 0.012 250);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:oklch(0.205 0.01 255); --surface:oklch(0.235 0.011 255); --paper:oklch(0.26 0.012 255);
+  --line:oklch(0.33 0.012 255); --line-strong:oklch(0.46 0.014 255);
+  --guide-bg:oklch(0.26 0.012 255); --guide-fg:oklch(0.95 0.005 250); --guide-muted:oklch(0.77 0.012 250);
+}
+body{font-family:var(--font); font-size:1rem; line-height:1.5}
+h1{font-family:var(--display); font-weight:600; font-size:clamp(1.75rem,3vw,2.375rem); letter-spacing:-0.012em; line-height:1.1; margin-bottom:var(--s3)}
+h2{font-family:var(--display); font-weight:600; letter-spacing:0; font-size:1.25rem; line-height:1.25}
+:focus-visible{outline:2px solid var(--fg); outline-offset:2px; border-radius:3px}
+
+/* tabs read as navigation, not as buttons */
+.tabs{background:none; border:0; border-bottom:1px solid var(--line-strong); border-radius:0; padding:0; gap:var(--s5); width:100%; margin-bottom:var(--s4)}
+.tab{border-radius:0; padding:10px 2px 9px; min-height:44px; border-bottom:2px solid transparent; margin-bottom:-1px; color:var(--muted); font-weight:400; font-size:1rem; background:none}
+.tab:hover{color:var(--fg); background:none}
+.tab[aria-selected="true"]{background:none; color:var(--fg); border-bottom-color:var(--fg); font-weight:600}
+
+/* buttons: square-cornered, clearly clickable, one set of states */
+.chip, .gbtn, .fix, .more-btn, .choice{border-radius:4px}
+.chip{min-height:40px; padding:7px 14px; font-weight:600; font-size:0.9375rem; background:var(--paper); border:1px solid var(--line-strong)}
+.chip:hover:not(:disabled), .more-btn:hover, .choice:hover{border-color:var(--fg); background:var(--paper)}
+.chip[aria-pressed="true"]{background:var(--fg); color:var(--paper); border-color:var(--fg)}
+.chip[aria-pressed="true"]:hover:not(:disabled){background:var(--fg); opacity:0.9}
+.chip:disabled, .fix:disabled, .gbtn:disabled, .range:disabled{opacity:0.4; cursor:not-allowed}
+.gbtn{min-height:44px}
+
+/* the guide: a quiet ruled panel, ink on paper */
+.guide{background:var(--guide-bg); border:1px solid var(--line-strong); border-radius:6px; box-shadow:none; padding:var(--s4) var(--s5) var(--s4)}
+.guide-count{font-size:0.875rem; font-weight:600; letter-spacing:0.01em}
+.guide h2{font-size:1.375rem}
+.guide p{font-size:1rem}
+#gText{font-family:var(--display); font-size:1.0625rem; line-height:1.55}
+.guide-do{font-weight:600}
+.gbtn{border-color:var(--line-strong); font-weight:600}
+.gbtn.primary{background:var(--fg); color:var(--paper); border-color:var(--fg)}
+.gbtn.primary:hover:not(:disabled){background:var(--fg); opacity:0.9}
+.gbtn.quiet{color:var(--muted)}
+.bar{background:var(--line)} .bar i{background:var(--fg)}
+.g-maths{border-top-color:var(--line); color:var(--muted); font-family:var(--font); font-size:0.9375rem}
+
+/* main instrument: light toolbar, dark canvas, light controls */
+.bench{background:var(--surface); border:1px solid var(--line-strong); border-radius:6px}
+.bench-bar{background:var(--surface); border-bottom:1px solid var(--line-strong)}
+.canvas{background:var(--stage)}
+.calc-bar{background:var(--surface); border-top:1px solid var(--line-strong)}
+.fields{background:var(--surface)}
+.field label{font-size:0.9375rem}
+.field output{font-family:var(--font); font-variant-numeric:tabular-nums lining-nums; font-weight:600; font-size:0.9375rem}
+.more-btn{display:inline-flex; width:auto; margin:0 var(--s4) var(--s4); padding:8px 14px; min-height:40px; align-items:center; border:1px solid var(--line-strong); background:var(--paper); font-size:0.9375rem}
+.eqs{background:var(--surface)}
+.eq-def{font-family:var(--display); font-size:1rem; line-height:1.55}
+.eq-lab{font-size:0.875rem}
+.eq-var{font-size:0.875rem; line-height:1.45}
+
+/* supporting sections: ruled, not boxed */
+.card{background:none; border:0; border-top:1px solid var(--line-strong); border-radius:0; padding:var(--s4) 0 var(--s2)}
+.chart-box{border-radius:4px; background:var(--paper)}
+.chart-lines{font-family:var(--font); font-weight:600}
+.verdict-title{font-family:var(--display); font-weight:600; font-size:1.5rem; letter-spacing:0}
+.verdict-body{font-size:1rem}
+.cap{font-size:0.875rem}
+.diocard p{font-family:var(--display); font-size:1rem; line-height:1.55}
+.diocard .dio-rule{font-family:var(--display)}
+.diocard .dio-say{font-family:var(--font); font-size:0.9375rem}
+#dioSvg{border-radius:4px}
+.cmp-t{font-size:0.9375rem}
+.adv{background:none; border:0; border-top:1px solid var(--line-strong); border-radius:0}
+.adv summary{font-family:var(--display); font-weight:600; padding-inline:0; border-radius:0}
+.adv-body{padding-inline:0}
+.row-why{font-family:var(--display); font-size:1rem; line-height:1.55; max-width:66ch}
+.badge{font-family:var(--font); font-weight:600}
+.routebar{padding-bottom:var(--s3); margin-bottom:var(--s4)}
+.route-now{font-size:1rem}
+
+/* start screen */
+.intro{padding-block:var(--s4) var(--s7)}
+.intro-card{background:var(--paper); border:1px solid var(--line-strong); border-radius:6px; padding:clamp(20px,4vw,32px); gap:var(--s4)}
+.intro-card h2{font-size:1.625rem}
+.intro-sub, .intro-note{font-family:var(--display); font-size:1.0625rem; line-height:1.55; color:var(--muted)}
+.choice{background:var(--surface); min-height:64px}
+.choice b{font-family:var(--display); font-weight:600; font-size:1.1875rem}
+.choice span{font-size:0.9375rem}
+.choice.primary{background:var(--fg); border-color:var(--fg); color:var(--paper)}
+.choice.primary span{color:color-mix(in oklch,var(--paper) 80%,var(--fg))}
+.choice.primary:hover{background:var(--fg); opacity:0.92}
+.intro-foot{align-items:center}
+
+/* science tab: a reading column */
+.why{max-width:740px; gap:var(--s5)}
+.why-lede{font-family:var(--display); font-size:1.1875rem; line-height:1.6; max-width:62ch}
+.topics{gap:0; border-bottom:1px solid var(--line-strong)}
+.topic, .why-bg, .why-refs{background:none; border:0; border-top:1px solid var(--line-strong); border-radius:0}
+.why-bg{border-bottom:0}
+.why-bg + .topics{margin-top:calc(-1 * var(--s5))}
+.topics + .why-refs{border-top:0; margin-top:calc(-1 * var(--s5))}
+.topic > summary, .why-bg > summary{padding:var(--s4) 0; border-radius:0; min-height:56px}
+.t-name{font-family:var(--display); font-weight:600; font-size:1.1875rem}
+.t-gist{font-size:0.9375rem}
+.t-body{padding:0 0 var(--s5); gap:var(--s4)}
+.t-body p{font-family:var(--display); font-size:1.0625rem; line-height:1.6; max-width:64ch}
+.t-lab{font-family:var(--font); font-size:0.8125rem; letter-spacing:0.03em; text-transform:uppercase}
+.t-yes, .t-no{padding:var(--s3) var(--s4); border-radius:4px}
+.t-yes{background:color-mix(in oklch,var(--c3) 7%,transparent)}
+.t-no{background:color-mix(in oklch,var(--warn-text) 8%,transparent)}
+.cite{font-family:var(--font); font-size:0.8125rem}
+.why-refs > summary{padding:var(--s3) 0; min-height:48px}
+.why-refs .refs{padding:0 0 var(--s4) 1.2em; font-size:0.875rem}
+.sig-steps li{border-radius:4px; background:var(--paper)}
+.sig-n{font-family:var(--font)}
+.sig figcaption{font-size:0.875rem}
+.sources h2{font-size:1.125rem}
+/* small explanatory figures in the science tab */
+.tfig{display:block; width:100%; max-width:460px; height:auto; margin-bottom:var(--s1)}
+.tfig text{font-family:var(--font); font-size:14px; fill:var(--muted)}
+.tfig text.strong{fill:var(--fg); font-weight:600}
+.tfig .ln{fill:none; stroke:var(--fg); stroke-width:1.5; stroke-linecap:round; stroke-linejoin:round}
+.tfig .ln.thin{stroke:var(--muted); stroke-width:1}
+.tfig .ray{fill:none; stroke:var(--ray-core); stroke-width:2; stroke-linecap:round; stroke-linejoin:round}
+.tfig .ray.dash{stroke-dasharray:3 4}
+.tfig .dot{fill:var(--ray-core)}
+.tfig .dot.hollow{fill:var(--bg); stroke:var(--ray-core); stroke-width:2}
+.tfig .lensf{fill:var(--lens-1); stroke:var(--lens-edge); stroke-width:1.2}
+.tfig .pg{fill:var(--paper); stroke:var(--line-strong)}
+.tfig .ink{fill:none; stroke:var(--fg); stroke-width:3.5; stroke-linecap:round}
+.tfig .sun{fill:var(--ray-glow); stroke:var(--ray-core); stroke-width:1.5}
+.tfig .bulb{fill:var(--ray-glow); opacity:0.55}
+.tfig .cone{fill:var(--c2); opacity:0.85}
+.tfig .box{fill:var(--paper); stroke:var(--line-strong)}
+
+/* ===== Compact layout: guide and eye visible together ===== */
+.page{padding-block:var(--s4) var(--s7)}
+h1{margin-bottom:var(--s2)}
+.tabs{margin-bottom:var(--s3)}
+.routebar{padding-bottom:0; margin-bottom:var(--s3)}
+.guide{gap:var(--s2); padding:var(--s3) var(--s4)}
+.guide-main{gap:2px}
+.guide h2{font-size:1.25rem}
+#gText{line-height:1.5}
+.guide-do{margin-top:var(--s1)}
+.gacts:empty{display:none}
+.layout .guide{margin-bottom:var(--s3)}
+/* mid widths (small laptops): keep the guide beside the eye instead of above it */
+@media (max-width:1100px) and (min-width:861px){
+  .layout{grid-template-columns:minmax(0,1fr) minmax(0,320px); grid-template-rows:auto auto auto auto 1fr;
+    grid-template-areas:"bench guide" "bench sees" "bench cmp" "bench dio" "bench ."}
+  .bench{margin-bottom:0}
+  .guide{padding-inline:var(--s3)}
+}
+.gbtn{white-space:nowrap} .gacts .gbtn{white-space:normal; text-align:left}
+.gbtn.quiet{padding-inline:4px}
+/* narrow screens: one compact instruction directly above the eye */
+@media (max-width:860px){
+  .layout .guide{margin-bottom:var(--s2)}
+  .guide-nav{gap:var(--s1)}
+}
+@media (max-width:640px){
+  .page{padding-block:var(--s3) var(--s6)}
+  h1{font-size:1.625rem}
+  .tab{min-height:44px; padding-block:8px 7px}
+  .guide{padding:var(--s3)}
+  .guide h2{font-size:1.1875rem}
+  .gbtn{padding-inline:12px}
+  .gbtn.quiet{padding-inline:2px}
+  .bench-bar{padding:var(--s2) var(--s3); min-height:0; gap:var(--s2)}
+  .bench-bar .group-label{position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap}
+  .bench-bar .group{gap:6px}
+  .bench-bar .chip{padding-inline:10px}
+}
+/* start screens */
+.intro{padding-block:var(--s2) var(--s5)}
+.intro-card{gap:var(--s3); padding:clamp(16px,3vw,24px) clamp(16px,3.5vw,28px)}
+.choices{gap:var(--s2)}
+.choice{min-height:56px; padding:10px 16px}
+
+/* ===== v19: framing hints on narrow screens, scope note ===== */
+.bench-view{position:relative}
+.bench-scroll:focus{outline:none}
+.edge-hint{position:absolute; top:0; bottom:0; width:20px; pointer-events:none; opacity:0; transition:opacity 160ms var(--ease); display:flex; align-items:center; justify-content:center}
+.edge-hint.left{left:0; background:linear-gradient(90deg, oklch(0.185 0.012 250 / 0.85), transparent)}
+.edge-hint.right{right:0; background:linear-gradient(270deg, oklch(0.185 0.012 250 / 0.85), transparent)}
+.edge-hint::after{content:""; width:8px; height:8px; border:solid var(--fg); border-width:0 2px 2px 0; opacity:0.9}
+.edge-hint.left::after{transform:rotate(135deg); margin-left:4px}
+.edge-hint.right::after{transform:rotate(-45deg); margin-right:4px}
+.bench-view.more-left .edge-hint.left, .bench-view.more-right .edge-hint.right{opacity:1}
+.scope-note{margin:0; font-size:0.875rem; color:var(--muted); max-width:70ch}
+
+html.dragging{overflow-anchor:none}
+/* phones: while the guide has every preset locked, hide that row so the eye and the step's control sit higher */
+@media (max-width:640px), (orientation:landscape) and (max-height:500px){
+  .bench-bar .group[data-g="presets"]:not(:has(.chip:not(:disabled))){display:none}
+}
+/* ===== v20: phones — controls next to the eye, landscape layout, "where next" button ===== */
+.bench > .fix{display:block; width:calc(100% - 2 * var(--s4)); margin:var(--s3) var(--s4) 0}
+.next-hint{position:fixed; left:50%; bottom:calc(14px + env(safe-area-inset-bottom, 0px)); transform:translateX(-50%); z-index:30;
+  display:inline-flex; align-items:center; gap:8px; max-width:calc(100vw - 32px); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  box-shadow:0 6px 20px oklch(0 0 0 / 0.28)}
+.nh-arrow{flex:none; width:8px; height:8px; border:solid currentColor; border-width:0 2px 2px 0; transform:rotate(45deg) translate(-2px,-2px)}
+.next-hint.up .nh-arrow{transform:rotate(-135deg) translate(-2px,-2px)}
+@media (max-width:860px){
+  .layout.dio-first{grid-template-areas:"guide" "dio" "bench" "sees" "cmp"}
+  .fields .field.step-ctl{order:-1}               /* the slider for this step comes first, right under the eye */
+}
+/* landscape phones: the eye fits the screen height; the guide and the active control sit beside it */
+@media (orientation:landscape) and (max-height:500px) and (min-width:560px){
+  .page{padding-block:var(--s3) var(--s6)}
+  .layout{grid-template-columns:minmax(0,1fr) minmax(0,290px); grid-template-rows:auto auto auto auto auto 1fr; column-gap:var(--s3);
+    grid-template-areas:"bench guide" "bench ctl" "bench sees" "bench cmp" "bench dio" "bench ."}
+  .layout.dio-first{grid-template-areas:"bench guide" "bench dio" "bench ctl" "bench sees" "bench cmp" "bench ."}
+  .bench{margin-bottom:0}
+  .bench-bar{padding:var(--s2) var(--s3); min-height:0; gap:var(--s2)}
+  .bench-scroll #bench{width:auto; min-width:0; max-width:none; height:max(230px, calc(100svh - 78px)); margin-inline:auto}
+  .layout .guide{margin-bottom:var(--s2); padding:var(--s3)}
+  .guide-nav{gap:var(--s1)}
+  .side-ctl{grid-area:ctl; margin-bottom:var(--s2); border:1px solid var(--line-strong); border-radius:6px; overflow:hidden; background:var(--surface)}
+  .side-ctl .fields{grid-template-columns:minmax(0,1fr); border-top:0}
+  .side-ctl .more-btn{margin:0 var(--s3) var(--s3)}
+  .side-ctl .fix{display:block; width:calc(100% - 2 * var(--s3)); margin:var(--s3)}
+  .cmp-t{width:100%; table-layout:fixed} .cmp-t th, .cmp-t td{overflow-wrap:anywhere}
+  .side-ctl:not(:has(.field:not([hidden]), .more-btn:not([hidden]), .fix:not([hidden]))){display:none}
+}
+</style>
+</head>
+<body>
+<main class="page">
+  <h1>How Myopia Blurs Vision</h1>
+  <div class="tabs" role="tablist" aria-label="Sections">
+    <button class="tab" type="button" role="tab" id="tabSim" aria-controls="panelSim" aria-selected="true">Simulation</button>
+    <button class="tab" type="button" role="tab" id="tabWhy" aria-controls="panelWhy" aria-selected="false" tabindex="-1">Why myopia develops</button>
+  </div>
+  <div id="panelSim" role="tabpanel" aria-labelledby="tabSim">
+    <button type="button" class="gbtn primary next-hint" id="nextHint" hidden><span class="nh-arrow" aria-hidden="true"></span><span id="nextHintText"></span></button>
+  <section class="intro" id="intro" aria-labelledby="iTitle">
+    <div class="intro-card" id="intro1">
+      <h2 id="iTitle" tabindex="-1">Choose an example</h2>
+      <p class="intro-sub">Each choice opens a learning example, not a diagnosis.</p>
+      <div class="choices">
+        <button class="choice" type="button" data-route="myopia"><b>Distant things look blurry</b><span>An eye that focuses light in front of the retina</span></button>
+        <button class="choice" type="button" data-route="close"><b>Close things look blurry</b><span>A short comparison of myopia and hyperopia</span></button>
+        <button class="choice" type="button" data-route="basics"><b>Both or not sure</b><span>Start with how the eye focuses</span></button>
+      </div>
+      <div class="intro-foot"><span class="intro-note">Already familiar with optics?</span><button class="chip" type="button" id="iSkip">Explore freely</button></div>
+    </div>
+    <div class="intro-card" id="intro2" hidden>
+      <h2 id="iTitle2" tabindex="-1">Start the guide</h2>
+      <p class="intro-sub">The guide shows one change at a time. Calculations can be opened or closed at any point.</p>
+      <div class="choices">
+        <button class="choice primary" type="button" data-maths="0"><b>Start guide</b><span>Calculations folded away</span></button>
+        <button class="choice" type="button" data-maths="1"><b>Start guide with calculations</b><span>Vergence and focal distance shown at each step</span></button>
+      </div>
+      <div class="intro-foot"><button class="chip" type="button" id="iBack">Back</button><button class="chip" type="button" id="iSkip2">Explore freely</button></div>
+    </div>
+  </section>
+
+  <div class="routebar" id="routeBar">
+    <span class="route-now" id="routeNow" tabindex="-1">Example: <b id="routeName"></b></span>
+    <span class="spacer"></span>
+    <button class="chip" type="button" id="rFull">Full guided tour</button>
+    <button class="chip" type="button" id="rChange">Change example</button>
+  </div>
+
+
+  <div class="layout">
+    <section class="guide" id="guide" aria-labelledby="gTitle">
+      <div class="guide-main" aria-live="polite">
+        <span class="guide-count" id="gCount"></span>
+        <h2 id="gTitle" tabindex="-1"></h2>
+        <p id="gText"></p>
+        <p class="guide-do" id="gDo"></p>
+        <div class="gacts" id="gActs"></div>
+      </div>
+      <div class="bar" aria-hidden="true"><i id="gBar"></i></div>
+      <div class="guide-nav">
+        <button class="gbtn quiet" type="button" id="gClose">Explore freely</button>
+        <span class="spacer"></span>
+        <button class="gbtn" type="button" id="gBack">Back</button>
+        <button class="gbtn primary" type="button" id="gNext">Next</button>
+      </div>
+    </section>
+
+    <figure class="bench" id="benchFig">
+      <div class="bench-bar">
+        <div class="group" role="group" aria-label="Example eyes" data-g="presets">
+          <span class="group-label">Presets</span>
+          <button class="chip" type="button" data-preset="typical" data-ctl="preTypical" id="preTypical" title="Reset the eye, object and glasses to the typical model">Typical</button>
+          <button class="chip" type="button" data-preset="near" data-ctl="preNear" id="preNear">Near-sighted</button>
+          <button class="chip" type="button" data-preset="high" data-ctl="preHigh" id="preHigh">High myopia</button>
+        </div>
+        <div class="group">
+          <button class="chip" type="button" id="partsBtn" data-ctl="parts" data-g="parts" aria-pressed="true">Labels</button>
+          <button class="chip" type="button" id="pause" aria-pressed="false">Pause motion</button>
+          
+        </div>
+      </div>
+
+      <div class="bench-view canvas" id="benchView">
+      <div class="bench-scroll canvas" id="benchScroll" tabindex="-1">
+        <svg id="bench" viewBox="0 0 920 480" role="img" aria-labelledby="benchDesc">
+          <desc id="benchDesc"></desc>
+          <defs>
+            <radialGradient id="gVit" cx="38%" cy="30%" r="82%"><stop offset="0" class="g-vit1"/><stop offset="1" class="g-vit2"/></radialGradient>
+            <linearGradient id="gScl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" class="g-scl1"/><stop offset="1" class="g-scl2"/></linearGradient>
+            <radialGradient id="gLens" cx="34%" cy="28%" r="78%"><stop offset="0" class="g-len1"/><stop offset="1" class="g-len2"/></radialGradient>
+            <linearGradient id="gGlass" x1="0" y1="0" x2="1" y2="1"><stop offset="0" class="g-gls1"/><stop offset="1" class="g-gls2"/></linearGradient>
+            <radialGradient id="gBlob"><stop offset="0" class="g-blob1"/><stop offset="1" class="g-blob2"/></radialGradient>
+            <filter id="soft" filterUnits="userSpaceOnUse" x="0" y="0" width="920" height="480"><feGaussianBlur stdDeviation="3.4"/></filter>
+            <clipPath id="clipVit"><path id="clipVitPath"/></clipPath>
+          </defs>
+
+          <line id="axis" x1="8" y1="250" x2="912" y2="250"/>
+          <ellipse id="eyeShadow" filter="url(#soft)" cx="0" cy="430" rx="10" ry="6"/>
+          <path id="nerveSheath" class="sheath"/>
+          <path id="nerveCore" class="nerve"/>
+          <path id="nerveVessel" class="vessel"/>
+          <path id="vit"/>
+          <g clip-path="url(#clipVit)">
+            <g id="vitFlow">
+              <ellipse class="blob" cx="-40" cy="-70" rx="90" ry="60" style="--d:13s;--x0:-18px;--y0:10px;--x1:26px;--y1:-14px"/>
+              <ellipse class="blob" cx="60" cy="60" rx="100" ry="66" style="--d:17s;--x0:22px;--y0:-12px;--x1:-24px;--y1:16px"/>
+              <ellipse class="blob" cx="90" cy="-50" rx="70" ry="50" style="--d:11s;--x0:-14px;--y0:-12px;--x1:16px;--y1:18px"/>
+              <ellipse class="blob" cx="-70" cy="80" rx="74" ry="46" style="--d:15s;--x0:12px;--y0:12px;--x1:-18px;--y1:-12px"/>
+              <g id="squiggles"></g>
+              <circle class="floater" r="1.8" cx="-30" cy="-110" style="--d:9s;--x0:-8px;--y0:4px;--x1:14px;--y1:-8px"/>
+              <circle class="floater" r="1.4" cx="70" cy="-86" style="--d:12s;--x0:10px;--y0:-6px;--x1:-12px;--y1:10px"/>
+              <circle class="floater" r="2" cx="40" cy="96" style="--d:10s;--x0:-12px;--y0:-8px;--x1:10px;--y1:8px"/>
+              <circle class="floater" r="1.5" cx="-80" cy="110" style="--d:14s;--x0:8px;--y0:6px;--x1:-10px;--y1:-10px"/>
+              <circle class="floater" r="1.3" cx="110" cy="30" style="--d:11s;--x0:-6px;--y0:10px;--x1:8px;--y1:-12px"/>
+            </g>
+          </g>
+          <path id="cilT" class="cil"/><path id="cilB" class="cil"/>
+          <path id="cilFibT" class="cil-fib"/><path id="cilFibB" class="cil-fib"/>
+          <path id="sclera"/>
+          <path id="choroid"/>
+          <path id="retina"/>
+          <path id="macula"/>
+          <circle id="disc" r="7.5"/>
+          <g id="zon"></g>
+          <path id="aq"/>
+          <path id="cornea"/>
+          <path id="corneaOut" class="cornea-edge"/>
+          <path id="corneaIn" class="cornea-edge"/>
+          <path id="irisT" class="iris"/><path id="irisB" class="iris"/>
+          <path id="irisBackT" class="iris-back"/><path id="irisBackB" class="iris-back"/>
+          <path id="clens"/>
+          <ellipse id="lamella" cy="250"/>
+          <ellipse id="nucleus" cy="250"/>
+          <path id="glasses" class="gl"/>
+
+          <path id="back" class="gp"/>
+          <path id="virt"/>
+          <g id="glow" class="glow" filter="url(#soft)"></g>
+          <g id="core" class="core"></g>
+          <g id="flow" class="stream"></g>
+
+          <path id="corneaHi" class="hi"/>
+          <path id="lensHi" class="hi" opacity="0.7"/>
+          <path id="glassHi" class="hi gl" opacity="0.7"/>
+
+          <path id="spot"/>
+          <circle id="fdot" r="5" cy="250"/>
+          <circle id="srcDot" class="gp" r="4.5" cy="250"/>
+          <circle id="objDot" r="4.5" cy="250"/>
+
+          <g id="strip">
+            <text id="eqA" class="eq" text-anchor="middle" y="33"></text>
+            <text id="eqB" class="eq gl two" text-anchor="middle" y="33"></text>
+            <text id="eqC" class="eq gp two" text-anchor="middle" y="33"></text>
+            <text id="eqD" class="eq" text-anchor="middle" y="33"></text>
+            <path id="ar1" class="eq-arrow gl two"/><path id="ar3" class="eq-arrow"/>
+            <g class="pill gl" id="pill2" style="--c:var(--c2)"><line x1="0" y1="68" x2="0" y2="138"/><rect x="-58" y="44" width="116" height="24" rx="12"/><text text-anchor="middle" y="60.5"></text></g>
+            <g class="pill" id="pill4" style="--c:var(--c4)"><line x1="6" y1="68" x2="20" y2="186"/><rect x="-58" y="44" width="116" height="24" rx="12"/><text text-anchor="middle" y="60.5"></text></g>
+            <text id="gapTxt" class="gp two" text-anchor="middle" y="60.5"></text>
+          </g>
+
+          <g id="rulers">
+            <path id="dim0" class="dim"/>
+            <path id="dimF" class="dim"/>
+            <path id="dimR" class="dim"/>
+            <text id="tDimF" text-anchor="end" y="450.5"></text>
+            <text id="tDimR" text-anchor="end" y="468.5"></text>
+          </g>
+
+          <text id="tSrc1" class="lab gp" text-anchor="middle" y="186">Apparent source</text>
+          <text id="tSrc2" class="sub gp" text-anchor="middle" y="203"></text>
+          <text id="tObj1" class="lab" text-anchor="middle" y="306">Object</text>
+          <text id="tObj2" class="sub" text-anchor="middle" y="323"></text>
+
+          <g id="parts"></g>
+        </svg>
+      </div>
+      <span class="edge-hint left" aria-hidden="true"></span><span class="edge-hint right" aria-hidden="true"></span>
+      </div>
+
+      <div class="calc-bar" data-g="mathsBtn">
+        <button class="chip" type="button" id="mathsBtn" aria-controls="eqs" aria-expanded="false">Show calculations</button>
+        <span class="note" id="calcNote">Vergence and focal distance, worked out live</span>
+      </div>
+      <div class="eqs" id="eqs" aria-live="polite"></div>
+
+      <div class="fields">
+        <div class="field" style="--c:var(--c1)" id="fObj" data-g="fObj">
+          <div class="field-head"><label for="obj">Object</label><output id="objOut" for="obj"></output></div>
+          <input class="range" type="range" id="obj" data-ctl="obj" min="0" max="24" step="1" value="24" aria-label="Object distance">
+        </div>
+        <div class="field" style="--c:var(--c2)" id="fP1" data-g="fP1">
+          <div class="field-head"><label for="p1">Glasses</label><output id="p1Out" for="p1"></output></div>
+          <input class="range" type="range" id="p1" data-ctl="p1" min="-10" max="8" step="0.25" value="0" aria-label="Glasses power in dioptres">
+        </div>
+        <div class="field" style="--c:var(--c4)" id="fP2" data-g="fP2">
+          <div class="field-head"><label for="p2">Combined eye power</label><output id="p2Out" for="p2"></output></div>
+          <input class="range" type="range" id="p2" data-ctl="p2" min="52" max="68" step="0.5" value="60" aria-label="Combined power of the cornea and crystalline lens, in dioptres">
+        </div>
+        <div class="field" style="--c:var(--c5)" id="fLen" data-g="fLen">
+          <div class="field-head"><label for="len">Eye length</label><output id="lenOut" for="len"></output></div>
+          <input class="range" type="range" id="len" data-ctl="len" min="20" max="28" step="0.1" value="22.3" aria-label="Model eye length, from the focusing plane to the retina, in millimetres">
+        </div>
+      </div>
+      <button class="more-btn" type="button" id="moreBtn" data-g="more" aria-expanded="false">More controls: object distance and glasses</button>
+    </figure>
+
+    <div class="side-ctl" id="sideCtl" hidden></div>
+
+    <section class="card sees" id="sees" data-g="sees" aria-live="polite" aria-label="What the eye sees">
+      <div class="chart-box"><div class="chart-lines" id="chartE" aria-hidden="true"><span>E</span><span>FP</span><span>TOZ</span></div></div>
+      <div class="verdict">
+        <p class="cap">What the eye sees</p>
+        <p class="verdict-title" id="vTitle"></p>
+        <p class="verdict-body" id="vBody"></p>
+      </div>
+      <button class="fix" type="button" id="fix" data-ctl="fix" hidden></button>
+    </section>
+
+    <section class="card cmp" id="cmpCard" data-g="cmp" aria-labelledby="hCmp">
+      <h2 id="hCmp">Myopia and hyperopia</h2>
+      <table class="cmp-t">
+        <thead><tr><th scope="col"></th><th scope="col">Myopia</th><th scope="col">Hyperopia</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Also called</th><td>Near-sightedness</td><td>Far-sightedness</td></tr>
+          <tr><th scope="row">Light focuses</th><td>In front of the retina</td><td>Behind the retina</td></tr>
+          <tr><th scope="row">Usual cause</th><td>Usually an eye too long for its focusing power (axial myopia)</td><td>Usually an eye too short, or too little focusing power</td></tr>
+          <tr><th scope="row">Tends to blur</th><td>Distant things</td><td>Close things</td></tr>
+          <tr><th scope="row">Accommodation</th><td>Adds power, so it cannot fix distant blur</td><td>Can make up for some of it, especially in young eyes</td></tr>
+          <tr><th scope="row">Lenses</th><td>Minus (concave)</td><td>Plus (convex)</td></tr>
+        </tbody>
+      </table>
+      <p class="cmp-note">Simplified. Sources: <a href="https://eyewiki.aao.org/Hyperopia" target="_blank" rel="noopener">EyeWiki: Hyperopia</a>, <a href="https://discovery.ucl.ac.uk/id/eprint/10072387/1/Yannuzzi_i1552-5783-60-3-m20.pdf" target="_blank" rel="noopener">IMI definitions paper</a>.</p>
+    </section>
+
+    <section class="card diocard" id="dioCard" data-g="dio" aria-labelledby="hDio">
+      <h2 id="hDio">Dioptres: a lens in air</h2>
+      <p>A dioptre (D) measures how strongly a lens bends light. A stronger lens brings light to a point closer to it. This example is a single lens in air.</p>
+      <p class="dio-rule">In air: power (D) = <span class="frac"><span>1</span><span>focal distance (m)</span></span></p>
+      <p>A +2 D lens focuses light 0.5 m away. A +4 D lens focuses it 0.25 m away. Minus lenses spread light out instead. The eye is about +60 D, but inside the eye light travels through fluid (n = 1.336), so the eye uses d = <span class="frac"><span>n</span><span>V</span></span> instead.</p>
+      <svg id="dioSvg" class="canvas" viewBox="0 0 352 130" role="img" aria-labelledby="dioSay">
+        <g class="dio-ruler">
+          <line x1="16" y1="104" x2="336" y2="104"/>
+          <line x1="16" y1="100" x2="16" y2="108"/><line x1="56" y1="101" x2="56" y2="107"/><line x1="96" y1="100" x2="96" y2="108"/><line x1="136" y1="101" x2="136" y2="107"/>
+          <line x1="176" y1="98" x2="176" y2="110"/>
+          <line x1="216" y1="101" x2="216" y2="107"/><line x1="256" y1="100" x2="256" y2="108"/><line x1="296" y1="101" x2="296" y2="107"/><line x1="336" y1="100" x2="336" y2="108"/>
+          <text x="18" y="124" text-anchor="middle">1 m</text><text x="96" y="124" text-anchor="middle">0.5 m</text><text x="176" y="124" text-anchor="middle">lens</text><text x="256" y="124" text-anchor="middle">0.5 m</text><text x="334" y="124" text-anchor="middle">1 m</text>
+        </g>
+        <path id="dioBack"/>
+        <g id="dioGlow" class="glow"></g>
+        <g id="dioCore" class="core"></g>
+        <g id="dioFlow" class="stream"></g>
+        <path id="dioLens"/>
+        <line id="dioDrop" x1="0" y1="54" x2="0" y2="104"/>
+        <circle id="dioDot" r="4.5" cy="54"/>
+        <text id="dioLab" text-anchor="middle" y="94"></text>
+      </svg>
+      <div class="field" style="--c:var(--c2)" id="fDio">
+        <div class="field-head"><label for="dio">Lens power</label><output id="dioOut" for="dio"></output></div>
+        <input class="range" type="range" id="dio" data-ctl="dio" min="-10" max="10" step="0.5" value="2" aria-label="Lens power in dioptres">
+      </div>
+      <p class="dio-say" id="dioSay"></p>
+    </section>
+  </div>
+
+  <details class="adv" id="adv" data-g="adv">
+    <summary><svg class="chev" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 6l5 5 5-5"/></svg>Calculations</summary>
+    <div class="adv-body">
+      <ol class="rows" id="rows">
+        <li style="--c:var(--c1)" id="row1"><span class="badge"></span><div class="row-main"><span class="row-title"></span><span class="row-math"></span><span class="row-why"></span></div><span class="row-num"></span></li>
+        <li style="--c:var(--c2)" id="row2"><span class="badge"></span><div class="row-main"><span class="row-title"></span><span class="row-math"></span><span class="row-why"></span></div><span class="row-num"></span></li>
+        <li style="--c:var(--c3)" id="row3"><span class="badge"></span><div class="row-main"><span class="row-title"></span><span class="row-math"></span><span class="row-why"></span></div><span class="row-num"></span></li>
+        <li style="--c:var(--c4)" id="row4"><span class="badge"></span><div class="row-main"><span class="row-title"></span><span class="row-math"></span><span class="row-why"></span></div><span class="row-num"></span></li>
+        <li style="--c:var(--c5)" id="row5"><span class="badge"></span><div class="row-main"><span class="row-title"></span><span class="row-math"></span><span class="row-why"></span></div><span class="row-num"></span></li>
+      </ol>
+      <div class="adv-side">
+        <div class="field" style="--c:var(--c3)" id="fGap">
+          <div class="field-head"><label for="gap">Gap to the eye</label><output id="gapOut" for="gap"></output></div>
+          <input class="range" type="range" id="gap" data-ctl="gap" min="0" max="20" step="1" value="0" aria-label="Gap between glasses and eye in millimetres">
+        </div>
+        <p id="gapNote">Glasses usually sit about 12 mm in front of the eye. Set this to 0 to ignore the gap.</p>
+        <p>This is a simplified schematic model. The cornea and crystalline lens are combined into one thin lens at the front of the eye, and the light paths come from that single lens. Eye length is measured from that focusing plane to the retina, so it is not the same as a clinical axial-length measurement. The anatomy is drawn for orientation, and the space in front of the eye is compressed. The image counts as sharp when the focus is within about 0.15 D of the retina.</p>
+      </div>
+    </div>
+  </details>
+  </div>
+
+  <section class="why" id="panelWhy" role="tabpanel" aria-labelledby="tabWhy" tabindex="-1" hidden>
+    <p class="why-lede">The simulation shows how a longer eye blurs distant vision, but not why an eye grows too long. Researchers have several overlapping ideas, and each has some support as well as important gaps.</p>
+
+    <details class="why-bg">
+      <summary><span class="t-name">Background: how the retina may steer eye growth</span><span class="t-gist">Shared by the ideas below, not a separate theory</span></summary>
+      <div class="t-body">
+        <figure class="sig" aria-label="Simplified signalling pathway">
+          <ol class="sig-steps">
+            <li><span class="sig-n">1</span>Light and patterns reach the eye</li>
+            <li><span class="sig-n">2</span>The retina detects them</li>
+            <li class="sig-unknown"><span class="sig-n">3</span>Chemical signals pass through the layers behind the retina</li>
+            <li><span class="sig-n">4</span>The sclera, the eye's outer wall, changes how fast it grows</li>
+          </ol>
+          <figcaption>Simplified. Visual feedback in eye growth is well supported. The specific cues and chemical steps in people, especially the dashed step, are not settled.</figcaption>
+        </figure>
+        <p>Animal and human studies support the idea that what the eye sees helps regulate how it grows. Which visual cues matter most in people, and which chemical signals carry the message to the eye wall, remain unresolved, and no single pathway explains common myopia. <a class="cite" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12701611/" target="_blank" rel="noopener">IMI light review</a></p>
+      </div>
+    </details>
+
+    <div class="topics" id="topics">
+      <details class="topic" name="topic">
+        <summary><span class="t-name">Near work and accommodation</span><span class="t-gist">Linked with myopia, but cause is unclear</span></summary>
+        <div class="t-body">
+          <svg class="tfig" viewBox="0 0 440 160" role="img" aria-label="A book held close to an eye. Rays from the book arrive spreading, and the lens thickens to focus them.">
+            <rect class="pg" x="16" y="48" width="44" height="56" rx="2"/>
+            <path class="ln thin" d="M24 62h28M24 72h28M24 82h28M24 92h20"/>
+            <path class="ray" d="M62 76 L252 52 L352 76 M62 76 L252 76 L352 76 M62 76 L252 100 L352 76"/>
+            <circle class="ln" cx="305" cy="76" r="50"/>
+            <ellipse class="lensf" cx="262" cy="76" rx="11" ry="24"/>
+            <circle class="dot" cx="352" cy="76" r="4"/>
+            <text x="12" y="128">Close object</text>
+            <text x="305" y="150" text-anchor="middle">The lens thickens to focus up close</text>
+          </svg>
+          <p><span class="t-lab">Idea</span>Long periods of reading or screen use up close may encourage the eye to grow. Accommodation means the inner lens changing its power to focus on something close.</p>
+          <p class="t-yes"><span class="t-lab">Evidence</span>Near work is often linked with myopia, but findings vary between studies. <a class="cite" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12701611/" target="_blank" rel="noopener">IMI light review</a> A review of school-age children found that their maximum near-focusing ability was lower than an older age-based formula predicts, with statistically significant differences at ages 6, 9, 10 and 11. <a class="cite" href="https://bioj-online.com/articles/10.22599/bioj.303" target="_blank" rel="noopener">Accommodation review</a></p>
+          <p class="t-no"><span class="t-lab">Still uncertain</span>This review measured maximum near-focusing ability, not eye growth, so it cannot establish whether accommodation causes or predicts myopia. <a class="cite" href="https://bioj-online.com/articles/10.22599/bioj.303" target="_blank" rel="noopener">Accommodation review</a></p>
+        </div>
+      </details>
+      <details class="topic" name="topic">
+        <summary><span class="t-name">Defocus</span><span class="t-gist">An eye-growth cue; human pathways remain under study</span></summary>
+        <div class="t-body">
+          <svg class="tfig" viewBox="0 0 440 160" role="img" aria-label="Two eyes. In the first, light comes to a focus in front of the retina. In the second, the focus would fall behind it.">
+            <path class="ray" d="M8 56 L70 56 L157 73.6 M8 70 L157 70 M8 84 L70 84 L157 66.4"/>
+            <circle class="ln" cx="110" cy="70" r="48"/>
+            <ellipse class="lensf" cx="70" cy="70" rx="6" ry="18"/>
+            <circle class="dot" cx="140" cy="70" r="4"/>
+            <path class="ray" d="M228 56 L290 56 L377 66.5 M228 70 L377 70 M228 84 L290 84 L377 73.5"/>
+            <path class="ray dash" d="M377 66.5 L404 70 M377 73.5 L404 70"/>
+            <circle class="ln" cx="330" cy="70" r="48"/>
+            <ellipse class="lensf" cx="290" cy="70" rx="6" ry="18"/>
+            <circle class="dot hollow" cx="404" cy="70" r="4"/>
+            <text x="110" y="140" text-anchor="middle">Focus in front of the retina</text>
+            <text x="330" y="140" text-anchor="middle">Focus behind the retina</text>
+          </svg>
+          <p><span class="t-lab">Idea</span>Defocus means light coming to a focus in front of or behind the retina. The eye may use the direction of blur as a signal to grow faster or slower.</p>
+          <p class="t-yes"><span class="t-lab">Evidence</span>In animals fitted with lenses that move the focus, the layer behind the retina quickly thins or thickens and the eye's growth later changes to match. In people, brief blur causes small, temporary changes in eye length. <a class="cite" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12701611/" target="_blank" rel="noopener">IMI light review</a></p>
+          <p class="t-no"><span class="t-lab">Still uncertain</span>Whether these short-term human changes predict long-term growth is debated, and they do not establish the full cause of human myopia. <a class="cite" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12701611/" target="_blank" rel="noopener">IMI light review</a></p>
+        </div>
+      </details>
+      <details class="topic" name="topic">
+        <summary><span class="t-name">Outdoor light and dopamine</span><span class="t-gist">Most consistent for delaying onset</span></summary>
+        <div class="t-body">
+          <svg class="tfig" viewBox="0 0 440 150" role="img" aria-label="A sun labelled outdoors, bright daylight, and a lamp labelled indoors, much dimmer light.">
+            <circle class="sun" cx="110" cy="56" r="22"/>
+            <path class="ln" d="M110 22v-12M110 90v12M76 56h-12M144 56h12M86 32l-8-8M134 80l8 8M134 32l8-8M86 80l-8 8"/>
+            <path class="ln" d="M306 34h48l14 34h-76z"/>
+            <circle class="bulb" cx="330" cy="76" r="7"/>
+            <path class="ln" d="M330 83v24M314 107h32"/>
+            <text class="strong" x="110" y="124" text-anchor="middle">Outdoors</text>
+            <text x="110" y="142" text-anchor="middle">Bright daylight, distant views</text>
+            <text class="strong" x="330" y="124" text-anchor="middle">Indoors</text>
+            <text x="330" y="142" text-anchor="middle">Much dimmer light</text>
+          </svg>
+          <p><span class="t-lab">Idea</span>Daylight is far brighter than indoor light, and the light and views outdoors differ in other ways too. Bright light may slow eye growth by raising dopamine, a chemical messenger in the retina.</p>
+          <p class="t-yes"><span class="t-lab">Evidence</span>Time outdoors is linked to fewer new cases of myopia in children. <a class="cite" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC11144779/" target="_blank" rel="noopener">Outdoor exposure review</a> Adding outdoor time at school slowed the onset of myopia in some trials, though not in all. <a class="cite" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12701611/" target="_blank" rel="noopener">IMI light review</a></p>
+          <p class="t-no"><span class="t-lab">Still uncertain</span>Evidence for slowing myopia that has already started is less definitive. How bright light affects dopamine and eye growth is not settled, and dopamine's role has not been confirmed in people. <a class="cite" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC11144779/" target="_blank" rel="noopener">Outdoor exposure review</a> <a class="cite" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12701611/" target="_blank" rel="noopener">IMI light review</a></p>
+        </div>
+      </details>
+      <details class="topic" name="topic">
+        <summary><span class="t-name">Contrast and ON/OFF pathways</span><span class="t-gist">A proposed idea with early evidence</span></summary>
+        <div class="t-body">
+          <svg class="tfig" viewBox="0 0 440 170" role="img" aria-label="Simplified diagram. Dark text on a light page is seen by a cone, which passes signals to ON bipolar cells, responding when light increases, and OFF bipolar cells, responding when light decreases.">
+            <rect class="pg" x="10" y="36" width="92" height="64" rx="2"/>
+            <path class="ink" d="M20 52h70M20 64h70M20 76h70M20 88h46"/>
+            <path class="ln" d="M106 68h34"/>
+            <path class="cone" d="M146 54 L176 62 L176 74 L146 82 Z"/>
+            <path class="ln" d="M180 64 L236 40 M180 72 L236 104"/>
+            <rect class="box" x="238" y="18" width="192" height="46" rx="3"/>
+            <rect class="box" x="238" y="82" width="192" height="46" rx="3"/>
+            <text class="strong" x="250" y="38">ON bipolar cells</text>
+            <text x="250" y="56">when light increases</text>
+            <text class="strong" x="250" y="102">OFF bipolar cells</text>
+            <text x="250" y="120">when light decreases</text>
+            <text x="56" y="120" text-anchor="middle">Dark text,</text>
+            <text x="56" y="137" text-anchor="middle">light page</text>
+            <text x="161" y="104" text-anchor="middle">Cone</text>
+            <text x="10" y="162">Simplified. Their role in eye growth is proposed.</text>
+          </svg>
+          <p><span class="t-lab">Idea</span>Contrast is the pattern of light and dark in what we see. Cones in the retina pass signals to ON and OFF bipolar cells, which help detect contrast. The contrast theory, proposed by Neitz and colleagues, suggests that activity in these pathways helps regulate eye growth. <a class="cite" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC11918120/" target="_blank" rel="noopener">Neitz contrast theory</a></p>
+          <p class="t-yes"><span class="t-lab">Evidence</span>Animal studies link ON and OFF pathway activity with eye growth. <a class="cite" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12701611/" target="_blank" rel="noopener">IMI light review</a></p>
+          <p class="t-no"><span class="t-lab">Still uncertain</span>No single contrast pathway has been established in people, so this remains a proposed explanation rather than an accepted one. <a class="cite" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12701611/" target="_blank" rel="noopener">IMI light review</a></p>
+        </div>
+      </details>
+      <details class="topic" name="topic">
+        <summary><span class="t-name">Genetic susceptibility</span><span class="t-gist">Affects individual risk, together with environment</span></summary>
+        <div class="t-body">
+          <svg class="tfig" viewBox="0 0 440 120" role="img" aria-label="Genes and surroundings both feed into how likely someone is to become near-sighted.">
+            <rect class="box" x="10" y="12" width="160" height="40" rx="3"/>
+            <rect class="box" x="10" y="68" width="160" height="40" rx="3"/>
+            <rect class="box" x="262" y="40" width="168" height="40" rx="3"/>
+            <path class="ln" d="M174 32 L254 56 M174 88 L254 64"/>
+            <path class="ln" d="M247 50 L256 58 L245 62"/>
+            <text class="strong" x="90" y="37" text-anchor="middle">Genes</text>
+            <text class="strong" x="90" y="93" text-anchor="middle">Surroundings</text>
+            <text class="strong" x="346" y="65" text-anchor="middle">Likelihood of myopia</text>
+          </svg>
+          <p><span class="t-lab">Idea</span>Genes affect how likely someone is to become near-sighted, partly by changing how they respond to their surroundings.</p>
+          <p class="t-yes"><span class="t-lab">Evidence</span>Myopia runs in families, and over 1,000 common gene variants have been linked to refractive error. Some variants appear to act differently depending on education, a sign that genes and environment interact. <a class="cite" href="https://doi.org/10.1167/iovs.66.13.22" target="_blank" rel="noopener">IMI genetics report</a></p>
+          <p class="t-no"><span class="t-lab">Still uncertain</span>The known variants explain only part of the differences between people, and much of myopia's heritability is still unexplained. <a class="cite" href="https://doi.org/10.1167/iovs.66.13.22" target="_blank" rel="noopener">IMI genetics report</a></p>
+        </div>
+      </details>
+    </div>
+
+    <details class="why-refs">
+      <summary>References for this tab</summary>
+      <ul class="refs">
+        <li><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12701611/" target="_blank" rel="noopener">IMI light review: Ashby R, et al. IMI: The role of light in refractive development and myopia: evidence from animal and human studies. Invest Ophthalmol Vis Sci. 2025;66(15):5.</a> Week 7 reading.</li>
+        <li><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC11144779/" target="_blank" rel="noopener">Outdoor exposure review: A review of mechanism of action of outdoor exposure in preventing myopia incidence and progression.</a></li>
+        <li><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC11918120/" target="_blank" rel="noopener">Neitz contrast theory paper: The predictive and explanatory power of the contrast theory of myopia.</a></li>
+        <li><a href="https://bioj-online.com/articles/10.22599/bioj.303" target="_blank" rel="noopener">Accommodation review: Munsamy AJ, et al. Evidence of the amplitude of accommodation of school-going children in the 21st century. Br Ir Orthopt J. 2023;19:52–63.</a></li>
+        <li><a href="https://doi.org/10.1167/iovs.66.13.22" target="_blank" rel="noopener">IMI genetics report: Voogelaar M, et al. IMI: Myopia genetics report. Invest Ophthalmol Vis Sci. 2025;66(13):22.</a></li>
+      </ul>
+    </details>
+  </section>
+
+  <footer class="sources" aria-labelledby="hSrc">
+    <p class="scope-note">Simplified model for learning. It is not a personal prescription or prediction, the blur is an illustration, and astigmatism is not modelled.</p>
+    <h2 id="hSrc">Sources</h2>
+    <ul>
+      <li><a href="https://wp.optics.arizona.edu/visualopticslab/wp-content/uploads/sites/52/2016/08/Class02_08.pdf" target="_blank" rel="noopener">Schematic eyes lecture, University of Arizona</a>: shapes, spacings, the 1.336 index.</li>
+      <li><a href="https://hrcak.srce.hr/en/102780" target="_blank" rel="noopener">Gullstrand's schematic eye, modified by Vojniković and Tamajo</a>: total power 59.98 D.</li>
+      <li><a href="https://www.slideshare.net/slideshow/reduced-eye-236951191/236951191" target="_blank" rel="noopener">Principle of the schematic eye</a>: Gullstrand's original 58.64 D.</li>
+      <li><a href="https://bmcophthalmol.biomedcentral.com/articles/10.1186/s12886-024-03395-9/tables/1" target="_blank" rel="noopener">Biometric data table, BMC Ophthalmology</a>: measured axial length and lens thickness from a lens-implant formula study. Used for comparison only; it does not validate this simplified model.</li>
+      <li><a href="https://doaj.org/article/679fbd2aba834cc4ad954700aa03c694" target="_blank" rel="noopener">Shahroud Eye Study</a>: in an adult cohort aged 55 to 64, axial length was the main factor associated with refractive error.</li>
+      <li><a href="https://eyewiki.aao.org/Eye_in_Numbers" target="_blank" rel="noopener">Eye in Numbers, EyeWiki</a>: reference values for the adult eye.</li>
+      <li><a href="https://www.aao.org/Assets/026681ea-6209-4be3-841c-938a922f7daa/637151349567700000/bo3r-pdf?inline=1" target="_blank" rel="noopener">Optics reference, American Academy of Ophthalmology</a>: U + P = V, with all three in dioptres.</li>
+      <li><a href="https://discovery.ucl.ac.uk/id/eprint/10072387/1/Yannuzzi_i1552-5783-60-3-m20.pdf" target="_blank" rel="noopener">IMI definitions paper</a>: axial myopia means an eye too long for its focusing power, separate from changes in the cornea or lens.</li>
+    </ul>
+  </footer>
+</main>
+
+<script>
+(function(){
+  'use strict';
+  var $ = function(id){ return document.getElementById(id); };
+  var SVGNS = 'http://www.w3.org/2000/svg';
+  var N = 1.336;                 // refractive index of the fluid inside the eye
+  var CY = 250, EX = 450;        // optical axis height, cornea apex x
+  var SC = 14;                   // px per mm inside the eye
+  var B = 161, HY = 81;          // globe inner half-height, cornea half-height
+  var HE = [-36,-24,-12,0,12,24,36];
+  var PUPIL_MM = 4;
+  var MINUS = '−';
+
+  var inputs = { obj:$('obj'), p1:$('p1'), gap:$('gap'), p2:$('p2'), len:$('len') };
+  var presets = {
+    typical: { obj:24, p1:0, p2:60, len:22.3 },
+    near:    { obj:24, p1:0, p2:60, len:24 },
+    high:    { obj:24, p1:0, p2:60, len:26 }
+  };
+  var bench = $('bench'), dio = $('dio'), guide = $('guide');
+  var GLASSES = true;              // corrective lens: set true to bring the Glasses slider, Correct button and gap back
+  var last = null, partsOn = true, narrow = false, dragging = false, flags = {};
+
+  /* ---------- helpers ---------- */
+  function f(x){ return x.toFixed(1); }
+  function num(x, dp){
+    var r = Math.abs(x) < 0.5 * Math.pow(10, -dp) ? 0 : x;
+    return (r < 0 ? MINUS : '') + Math.abs(r).toFixed(dp);
+  }
+  function signed(x, dp){ var s = num(x, dp); return (x > 0 && parseFloat(s) !== 0 ? '+' : '') + s; }
+  function par(x, dp){ var s = num(x, dp); return s.charAt(0) === MINUS ? '(' + s + ')' : s; }
+  function dioTxt(x){ var s = num(x, 2); return parseFloat(s.replace(MINUS, '-')) === 0 ? '0' : signed(x, 2); }
+  function pts(a){ return a.map(function(p, i){ return (i ? 'L' : 'M') + f(p[0]) + ' ' + f(p[1]); }).join(' '); }
+  function clamp(x, lo, hi){ return Math.max(lo, Math.min(hi, x)); }
+  function set(el, attrs){ for (var k in attrs) el.setAttribute(k, attrs[k]); }
+  function make(tag, parent, attrs){ var e = document.createElementNS(SVGNS, tag); if (attrs) set(e, attrs); parent.appendChild(e); return e; }
+  function b(s){ return '<b>' + s + '</b>'; }
+  function say(x, dp){ var r = +x.toFixed(dp); return r === 0 ? '0' : (r < 0 ? 'minus ' : 'plus ') + Math.abs(r).toFixed(dp); }
+  function frac(t, d){ return '<span class="frac"><span>' + t + '</span><span>' + d + '</span></span>'; }
+
+  /* ---------- the optics: the same vergence chain as before ---------- */
+  function model(){
+    var k = +inputs.obj.value, p1 = +inputs.p1.value, gap = +inputs.gap.value, p2 = +inputs.p2.value, len = +inputs.len.value;
+    var u1 = -(24 - k) * 0.25;            // object vergence at the glasses, D
+    var v1 = u1 + p1;                     // lens rule
+    var t = p1 === 0 ? 0 : gap / 1000;    // gap in metres (no glasses, no gap)
+    var u2 = v1 / (1 - t * v1);           // distance rule, same as -1 / (|1/V1| + gap)
+    var v2 = u2 + p2;                     // lens rule again
+    var dmm = N / v2 * 1000;              // focus distance inside the eye, mm
+    var target = N / (len / 1000);        // vergence that would land exactly on the retina
+    var err = v2 - target;                // + means the focus falls short
+    var u2s = target - p2;
+    var p1s = Math.round((u2s / (1 + t * u2s) - u1) * 4) / 4;
+    return { two:p1 !== 0, k:k, p1:p1, gap:gap, t:t, p2:p2, len:len, u1:u1, v1:v1, u2:u2, v2:v2, dmm:dmm,
+             miss:dmm - len, sharp:Math.abs(err) <= 0.15, p1s:p1s };
+  }
+
+  /* ---------- static pieces built once ---------- */
+  function rayLayers(ids, n){
+    return ids.map(function(id, gi){
+      var list = [];
+      for (var i = 0; i < n; i++){
+        var p = make('path', $(id));
+        if (gi === 1) p.setAttribute('pathLength', '1');
+        list.push(p);
+      }
+      return list;
+    });
+  }
+  var rays = rayLayers(['glow','core','flow'], HE.length);
+  var dRays = rayLayers(['dioGlow','dioCore','dioFlow'], 3);
+  var zon = []; for (var z = 0; z < 8; z++) zon.push(make('path', $('zon')));
+  /* slow currents in the vitreous: a gentle ripple on a longer swell */
+  [-104, -58, 62, 108].forEach(function(y0, i){
+    var p = [];
+    for (var x = -165; x <= 170; x += 4){
+      p.push([x, y0 + 7 * Math.sin(x / 15 + i * 1.9) + 5 * Math.sin(x / 41 + i * 1.1)]);
+    }
+    var el = make('path', $('squiggles'), { 'class':'current', d:pts(i % 2 ? p.reverse() : p) });
+    el.style.setProperty('--d', (11 + i * 2.5) + 's');
+  });
+  var PARTS = ['Cornea','Iris','Lens','Zonule fibres','Ciliary muscle','Vitreous humour','Retina','Optic nerve'];
+  var parts = PARTS.map(function(name){
+    var g = make('g', $('parts'));
+    var line = make('line', g), dot = make('circle', g, { r:2 }), text = make('text', g);
+    text.textContent = name;
+    return { line:line, dot:dot, text:text };
+  });
+  function part(i, anchor, tx, ty, lx1, ly1, lx2, ly2){
+    var p = parts[i];
+    set(p.text, { 'text-anchor':anchor, x:f(tx), y:f(ty) });
+    if (lx1 == null){ p.line.style.display = 'none'; p.dot.style.display = 'none'; return; }
+    set(p.line, { x1:f(lx1), y1:f(ly1), x2:f(lx2), y2:f(ly2) });
+    set(p.dot, { cx:f(lx2), cy:f(ly2) });
+  }
+
+  /* ---------- drawing the bench ---------- */
+  function draw(m){
+    var G = (narrow ? 120 : 226) + m.gap * 3, gx = EX - G;
+    var rx = EX + m.len * SC, gl = EX + 26, a = (rx - gl) / 2, gcx = (rx + gl) / 2;
+    var ao = a + 6, bo = B + 6;
+    var lx = gcx - ao * Math.sqrt(1 - Math.pow(HY / bo, 2));
+    var ix = lx + 6;
+    var wallY = function(x){ return B * Math.sqrt(Math.max(0, 1 - Math.pow((x - gcx) / a, 2))); };
+    var yi = wallY(ix);
+    var lcx = ix + 28;
+    var fx = EX + m.dmm * SC;
+    /* how hard the eye is focusing: 0 = relaxed and flat, 1 = squeezed and round */
+    var k = clamp((m.p2 - 52) / 16, 0, 1);
+    var rA = 15 + 13 * k, rP = 24 + 10 * k, ry = 69 - 11 * k, PUP = 49 - 7 * k;
+    var arc = function(A, Bq, t){
+      var x0 = gcx + A * Math.cos(t), y0 = Bq * Math.sin(t);
+      return 'M' + f(x0) + ' ' + f(CY - y0) + ' A' + f(A) + ' ' + f(Bq) + ' 0 1 1 ' + f(x0) + ' ' + f(CY + y0);
+    };
+
+    /* the globe and its layers */
+    set($('eyeShadow'), { cx:f(gcx), rx:f(a * 0.82) });
+    var nt = 0.33, npx = gcx + ao * Math.cos(nt), npy = CY + bo * Math.sin(nt);
+    var nd = pts([[npx - 6, npy - 2], [npx + 44, npy + 9]]);
+    $('nerveSheath').setAttribute('d', nd); $('nerveCore').setAttribute('d', nd);
+    $('nerveVessel').setAttribute('d', pts([[npx - 10, npy - 3], [npx + 44, npy + 9]]));
+    var vd = 'M' + f(ix) + ' ' + f(CY - yi) + ' A' + f(a) + ' ' + B + ' 0 1 1 ' + f(ix) + ' ' + f(CY + yi) + ' Z';
+    $('vit').setAttribute('d', vd); $('clipVitPath').setAttribute('d', vd);
+    $('vitFlow').setAttribute('transform', 'translate(' + f(gcx + 14) + ' ' + CY + ') scale(' + (a / 160).toFixed(3) + ' 1)');
+    $('sclera').setAttribute('d', 'M' + f(lx) + ' ' + (CY - HY) + ' A' + f(ao) + ' ' + bo + ' 0 1 1 ' + f(lx) + ' ' + (CY + HY));
+    $('choroid').setAttribute('d', arc(a + 0.5, B + 0.5, 2.2));
+    $('retina').setAttribute('d', arc(a - 3.5, B - 3.5, 2.1));
+    var mA = a - 3.5, mB = B - 3.5, mt = 0.07;
+    $('macula').setAttribute('d', 'M' + f(gcx + mA * Math.cos(mt)) + ' ' + f(CY - mB * Math.sin(mt)) + ' A' + f(mA) + ' ' + f(mB) + ' 0 0 1 ' + f(gcx + mA * Math.cos(mt)) + ' ' + f(CY + mB * Math.sin(mt)));
+    set($('disc'), { cx:f(gcx + (a - 2) * Math.cos(nt)), cy:f(CY + (B - 2) * Math.sin(nt)) });
+
+    /* ciliary muscle and zonule fibres: the muscle swells inward and the fibres go slack as the eye focuses harder */
+    var cil = function(s, idBody, idFib, zi){
+      var Ax = ix + 1, Ay = CY + s * (yi - 1), Bx = ix + 44, By = CY + s * wallY(ix + 44);
+      var dx = Bx - Ax, dy = By - Ay, len = Math.sqrt(dx * dx + dy * dy); dx /= len; dy /= len;
+      var nx = -dy, ny = dx, mx = (Ax + Bx) / 2, my = (Ay + By) / 2;
+      if ((gcx - mx) * nx + (CY - my) * ny < 0){ nx = -nx; ny = -ny; }
+      var reach = 14 + 13 * k, fat = 9 + 8 * k;
+      var Cx = mx + nx * reach - dx * (3 + 5 * k), Cy = my + ny * reach - dy * (3 + 5 * k);
+      $(idBody).setAttribute('d', 'M' + f(Ax - nx * 4) + ' ' + f(Ay - ny * 4) + ' Q' + f(Ax + nx * fat) + ' ' + f(Ay + ny * fat) + ' ' + f(Cx) + ' ' + f(Cy) +
+        ' Q' + f(Bx + nx * (fat - 4) - dx * 8) + ' ' + f(By + ny * (fat - 4) - dy * 8) + ' ' + f(Bx - nx * 4) + ' ' + f(By - ny * 4) + ' Z');
+      $(idFib).setAttribute('d',
+        pts([[Ax + dx * 6 + nx * 4, Ay + dy * 6 + ny * 4], [Bx - dx * 6 + nx * 3, By - dy * 6 + ny * 3]]) + ' ' +
+        pts([[Ax + dx * 10 + nx * (5 + fat * 0.4), Ay + dy * 10 + ny * (5 + fat * 0.4)], [Bx - dx * 16 + nx * (4 + fat * 0.4), By - dy * 16 + ny * (4 + fat * 0.4)]]));
+      for (var q = 0; q < 4; q++){
+        var o = q - 1.5;
+        var x1 = Cx + dx * o * 4 - nx * 2, y1 = Cy + dy * o * 4 - ny * 2;
+        var x2 = lcx + (rP - rA) / 2 + o * 6, y2 = CY + s * (ry - 1 - Math.abs(o) * 2);
+        var sag = k * 9 * (q % 2 ? 1 : -1) + k * 3;
+        var ex = x2 - x1, ey = y2 - y1, el = Math.sqrt(ex * ex + ey * ey) || 1;
+        zon[zi + q].setAttribute('d', 'M' + f(x1) + ' ' + f(y1) + ' Q' + f((x1 + x2) / 2 - ey / el * sag) + ' ' + f((y1 + y2) / 2 + ex / el * sag) + ' ' + f(x2) + ' ' + f(y2));
+      }
+      return [Cx, Cy];
+    };
+    cil(-1, 'cilT', 'cilFibT', 0);
+    var cilB = cil(1, 'cilB', 'cilFibB', 4);
+
+    /* cornea, aqueous, iris */
+    var cxc = 2 * (EX + 4) - lx;
+    $('cornea').setAttribute('d', 'M' + f(lx) + ' ' + (CY - HY) + ' Q' + f(cxc) + ' ' + CY + ' ' + f(lx) + ' ' + (CY + HY));
+    $('corneaOut').setAttribute('d', 'M' + f(lx - 3) + ' ' + (CY - HY - 1) + ' Q' + f(2 * EX - lx + 3) + ' ' + CY + ' ' + f(lx - 3) + ' ' + (CY + HY + 1));
+    $('corneaIn').setAttribute('d', 'M' + f(lx + 3) + ' ' + (CY - HY + 2) + ' Q' + f(2 * (EX + 8) - lx - 3) + ' ' + CY + ' ' + f(lx + 3) + ' ' + (CY + HY - 2));
+    $('aq').setAttribute('d', 'M' + f(lx + 3) + ' ' + (CY - HY + 2) + ' Q' + f(2 * (EX + 8) - lx - 3) + ' ' + CY + ' ' + f(lx + 3) + ' ' + (CY + HY - 2) +
+      ' L' + f(ix) + ' ' + (CY + HY - 2) + ' L' + f(lcx - rA + 4) + ' ' + f(CY + PUP) + ' L' + f(lcx - rA + 4) + ' ' + f(CY - PUP) + ' L' + f(ix) + ' ' + (CY - HY + 2) + ' Z');
+    var iris = function(s, id, idBack){
+      var ry0 = CY + s * (yi - 3), ty = CY + s * PUP;
+      $(id).setAttribute('d', pts([[ix - 4.5, ry0], [ix + 4.5, ry0], [ix + 2.5, ty], [ix - 2.5, ty]]) + ' Z');
+      $(idBack).setAttribute('d', pts([[ix + 5, ry0], [ix + 3, ty]]));
+    };
+    iris(-1, 'irisT', 'irisBackT'); iris(1, 'irisB', 'irisBackB');
+
+    /* crystalline lens: flat and wide when relaxed, thick and round when focusing */
+    $('clens').setAttribute('d', 'M' + f(lcx) + ' ' + f(CY - ry) + ' A' + f(rA) + ' ' + f(ry) + ' 0 0 0 ' + f(lcx) + ' ' + f(CY + ry) + ' A' + f(rP) + ' ' + f(ry) + ' 0 0 0 ' + f(lcx) + ' ' + f(CY - ry) + ' Z');
+    var lmid = lcx + (rP - rA) / 2;
+    set($('lamella'), { cx:f(lmid), rx:f((rA + rP) / 2 - 4), ry:f(ry - 12) });
+    set($('nucleus'), { cx:f(lmid), rx:f((rA + rP) / 2 - 10), ry:f(ry - 24) });
+    var cp = function(u){ return [EX + u * u * (lx - EX) + 2.4, CY + u * HY]; };
+    var c0 = cp(-0.8), c1 = cp(-0.56), c2 = cp(-0.32);
+    $('corneaHi').setAttribute('d', 'M' + f(c0[0]) + ' ' + f(c0[1]) + ' Q' + f(c1[0] - 0.8) + ' ' + f(c1[1]) + ' ' + f(c2[0]) + ' ' + f(c2[1]));
+    $('lensHi').setAttribute('d', 'M' + f(lcx - rA * 0.5) + ' ' + f(CY - ry * 0.58) + ' Q' + f(lcx - rA * 0.8) + ' ' + f(CY - ry * 0.3) + ' ' + f(lcx - rA * 0.8) + ' ' + (CY - 4));
+
+    /* glasses lens: its shape follows its power */
+    var H = 110, te, tc;
+    if (m.p1 < 0){ tc = 3; te = 3 + Math.min(-m.p1, 10) * 1.6; }
+    else if (m.p1 > 0){ te = 2.5; tc = 2.5 + m.p1 * 2.2; }
+    else { te = 3; tc = 3; }
+    var cq = 2 * tc - te;
+    $('glasses').setAttribute('d', 'M' + f(gx - te) + ' ' + (CY - H) + ' Q' + f(gx - cq) + ' ' + CY + ' ' + f(gx - te) + ' ' + (CY + H) +
+      ' L' + f(gx + te) + ' ' + (CY + H) + ' Q' + f(gx + cq) + ' ' + CY + ' ' + f(gx + te) + ' ' + (CY - H) + ' Z');
+    $('glasses').style.opacity = m.p1 === 0 ? 0.4 : 1;
+    var hx = gx - (te + tc) / 2 + 1.5;
+    $('glassHi').setAttribute('d', pts([[hx, CY - H + 10], [hx + (tc - te) * -0.3, CY - 40]]));
+
+    /* schematic geometry in front of the eye */
+    var D1 = m.v1 !== 0 ? (m.v1 > 0 ? 130 + 160 / m.v1 : 50 + 110 / Math.abs(m.v1)) : Infinity;
+    var r = m.v1 < 0 ? D1 / (D1 + G) : (m.v1 > 0 ? (D1 + G) / D1 : 1);
+    var sx = gx - D1;
+    var ox = m.u1 < 0 ? gx - (110 + 160 / Math.abs(m.u1)) : -Infinity;
+
+    var hits = [], back = [], virt = [];
+    HE.forEach(function(he, i){
+      var hg = he * r, p = [];
+      if (m.u1 === 0) p.push([-14, CY + hg]);
+      else if (ox >= 6) p.push([ox, CY]);
+      else p.push([-14, CY + hg * (-14 - ox) / (gx - ox)]);
+      p.push([gx, CY + hg]);
+      var xc = EX + Math.pow(he / HY, 2) * (lx - EX);
+      p.push([xc, CY + he]);
+      var yAt = function(x){ return CY + he * (fx - x) / (fx - xc); };
+      var x = rx, y = CY;
+      for (var n = 0; n < 4; n++){ y = yAt(x); x = gcx + a * Math.sqrt(Math.max(0, 1 - Math.pow((y - CY) / B, 2))); }
+      y = yAt(x);
+      if (fx < x - 0.5) p.push([fx, CY]);
+      p.push([x, y]);
+      hits.push([x, y]);
+      var d = pts(p);
+      rays[0][i].setAttribute('d', d); rays[1][i].setAttribute('d', d); rays[2][i].setAttribute('d', d);
+      if (m.v1 < 0 && he !== 0){
+        var x0 = Math.max(sx, 0);
+        back.push(pts([[gx, CY + hg], [x0, CY + hg * (x0 - sx) / (gx - sx)]]));
+      }
+      if (fx > rx + 1 && he !== 0){
+        var x1 = Math.min(fx, 908);
+        virt.push(pts([[x, y], [x1, yAt(x1)]]));
+      }
+    });
+    $('back').setAttribute('d', back.join(' '));
+    $('virt').setAttribute('d', virt.join(' '));
+    $('spot').setAttribute('d', pts(hits));
+    var fdx = Math.min(fx, 908);
+    set($('fdot'), { cx:f(fdx) });
+    $('fdot').style.display = fx > 908 ? 'none' : '';
+
+    /* vergence labels along the top: U and V either side of each lens, P on the lens */
+    var mid = (gx + EX) / 2, two = false, hasGap = false;
+    bench.classList.toggle('one-lens', !two);
+    bench.classList.toggle('no-gap', !hasGap);
+    var lab = function(id, x, sym, sub, val){
+      var e = $(id); e.setAttribute('x', f(x));
+      e.innerHTML = '<tspan>' + sym + '</tspan>' + (sub ? '<tspan dy="4" font-size="11">' + sub + '</tspan><tspan dy="-4">' : '<tspan>') + (narrow ? '\u2009=\u2009' : ' = ') + val + '</tspan>';
+    };
+    var arrow = function(id, x){ $(id).setAttribute('d', 'M' + f(x - 8) + ' 28 H' + f(x + 8) + ' M' + f(x + 3) + ' 23 L' + f(x + 8) + ' 28 L' + f(x + 3) + ' 33'); };
+    lab('eqA', narrow ? EX - 16 : EX - 72, 'U', '', dioTxt(m.u2) + ' D');
+    $('eqA').setAttribute('text-anchor', narrow ? 'end' : 'middle');
+    lab('eqB', gx + 72, 'V', '1', dioTxt(m.v1) + ' D');
+    lab('eqC', EX - 72, 'U', '2', dioTxt(m.u2) + ' D');
+    lab('eqD', narrow ? EX + 16 : EX + 72, 'V', two ? '2' : '', dioTxt(m.v2) + ' D');
+    $('eqD').setAttribute('text-anchor', narrow ? 'start' : 'middle');
+    arrow('ar1', gx); arrow('ar3', EX);
+    $('pill2').setAttribute('transform', 'translate(' + f(gx) + ' 0)');
+    $('pill2').querySelector('text').textContent = 'glasses ' + signed(m.p1, 2) + ' D';
+    $('pill4').setAttribute('transform', 'translate(' + EX + ' 0)');
+    $('pill4').querySelector('text').innerHTML = two ? 'P<tspan dy="3" font-size="10">2</tspan><tspan dy="-3"> = ' + signed(m.p2, 2) + ' D</tspan>' : 'P = ' + signed(m.p2, 2) + ' D';
+    var gt = $('gapTxt'); gt.setAttribute('x', f(mid)); gt.textContent = m.gap + ' mm gap';
+    var place = function(id, x, txt){ var e = $(id); e.setAttribute('x', f(x)); e.innerHTML = txt; };
+
+    /* two rulers under the eye: where the light meets, and where the retina is */
+    var yF = 446, yR = 464;
+    $('dim0').setAttribute('d', 'M' + EX + ' 438 V472');
+    $('dimF').setAttribute('d', 'M' + EX + ' ' + yF + ' H' + f(fdx) + ' M' + f(fdx) + ' ' + (yF - 6) + ' V' + (yF + 6));
+    $('dimR').setAttribute('d', 'M' + EX + ' ' + yR + ' H' + f(rx) + ' M' + f(rx) + ' ' + (yR - 6) + ' V' + (yR + 6));
+    /* narrow screens: the two readouts sit just above their rulers, so they do not widen the view */
+    place('tDimF', narrow ? EX + 8 : EX - 12, (narrow ? 'd \u2248 ' : 'focal distance d \u2248 ') + m.dmm.toFixed(1) + ' mm');
+    place('tDimR', narrow ? EX + 8 : EX - 12, (narrow ? 'retina ' : 'retina at ') + m.len.toFixed(1) + ' mm');
+    set($('tDimF'), { 'text-anchor':narrow ? 'start' : 'end', y:narrow ? 441.5 : 450.5 });
+    set($('tDimR'), { 'text-anchor':narrow ? 'start' : 'end', y:narrow ? 459.5 : 468.5 });
+
+    /* apparent source (only when the gap is in play) and a near object */
+    var showSrc = m.v1 < 0 && hasGap;
+    ['tSrc1','tSrc2','srcDot','back'].forEach(function(id){ $(id).style.display = showSrc ? '' : 'none'; });
+    if (showSrc){
+      var dist = (1 / Math.abs(m.v1)).toFixed(2), on = sx >= 8;
+      $('srcDot').style.display = on ? '' : 'none';
+      var slx = on ? clamp(sx, 92, Math.max(92, gx - 100)) : 92;
+      set($('srcDot'), { cx:f(sx) }); set($('tSrc1'), { x:f(slx) }); set($('tSrc2'), { x:f(slx) });
+      $('tSrc2').textContent = 'd\u2081 = ' + MINUS + dist + ' m';
+    }
+    var showObj = m.u1 < 0 && ox >= 6;
+    ['tObj1','tObj2','objDot'].forEach(function(id){ $(id).style.display = showObj ? '' : 'none'; });
+    if (showObj){
+      var olx = clamp(ox, 84, Math.max(84, gx - 100));
+      set($('objDot'), { cx:f(ox) }); set($('tObj1'), { x:f(olx) }); set($('tObj2'), { x:f(olx) });
+      $('tObj2').textContent = (1 / Math.abs(m.u1)).toFixed(2) + ' m away';
+    }
+
+    /* names of the parts */
+    part(0, 'end', EX - 20, CY + 120, EX - 15, CY + 115, EX + Math.pow(56 / HY, 2) * (lx - EX) + 2, CY + 56);
+    part(1, 'end', EX - 20, CY + 146, EX - 15, CY + 141, ix - 3, CY + 66);
+    part(2, 'start', lcx + 62, CY + 88, lcx + 58, CY + 84, lcx + rP * 0.55, CY + 44);
+    part(3, 'start', lcx + 62, CY + 111, lcx + 58, CY + 107, lcx + 4, CY + ry + 9);
+    part(4, 'start', lcx + 62, CY + 134, lcx + 58, CY + 130, cilB[0] - 5, cilB[1] + 7);
+    part(5, 'middle', gcx + a * 0.3, CY - 108);
+    if (narrow) part(6, 'end', rx - 30, CY - 66, rx - 28, CY - 70, rx - 12, CY - 70);   // inside the wall on narrow screens
+    else part(6, 'start', rx + 20, CY - 66, rx + 16, CY - 70, rx - 12, CY - 70);
+    part(7, 'start', npx - 2, npy + 50);
+
+    var dsrc = m.u1 === 0 ? 'Light from a distant object arrives parallel, a vergence of 0 dioptres.'
+      : 'Light from an object ' + (1 / Math.abs(m.u1)).toFixed(2) + ' metres away arrives spreading out, a vergence of ' + say(m.u1, 2) + ' dioptres.';
+    var dgl = m.p1 !== 0 ? ' Glasses of ' + say(m.p1, 2) + ' dioptres add to that, so the light entering the eye has a vergence of ' + say(m.u2, 2) + ' dioptres.' : '';
+    var dres = m.sharp ? 'the image is approximately sharp.' : 'the image is blurred, with the focus about ' + Math.abs(m.miss).toFixed(1) + ' millimetres ' + (m.miss < 0 ? 'in front of' : 'behind') + ' the retina.';
+    $('benchDesc').textContent = 'Side view of a schematic eye. ' + dsrc + dgl + ' The combined cornea and lens power of ' + m.p2.toFixed(1) +
+      ' dioptres brings it to a focus about ' + m.dmm.toFixed(1) + ' millimetres behind the model\u2019s focusing plane. The retina is ' + m.len.toFixed(1) + ' millimetres back, so ' + dres;
+  }
+
+  /* ---------- the dioptre box ---------- */
+  function drawDio(){
+    var D = +dio.value, X = 176, Y = 54, PPM = 160, hs = [-24, 0, 24];
+    var H = 34, te, tc;
+    if (D < 0){ tc = 2; te = 2 + Math.min(-D, 10) * 0.9; }
+    else if (D > 0){ te = 1.5; tc = 1.5 + D * 1.1; }
+    else { te = 2; tc = 2; }
+    var cq = 2 * tc - te;
+    $('dioLens').setAttribute('d', 'M' + f(X - te) + ' ' + (Y - H) + ' Q' + f(X - cq) + ' ' + Y + ' ' + f(X - te) + ' ' + (Y + H) +
+      ' L' + f(X + te) + ' ' + (Y + H) + ' Q' + f(X + cq) + ' ' + Y + ' ' + f(X + te) + ' ' + (Y - H) + ' Z');
+    var P = D !== 0 ? X + PPM / D : null, back = [];
+    hs.forEach(function(h, i){
+      var p = [[-10, Y + h], [X, Y + h]], END = 362;
+      if (D > 0){
+        if (P < END) p.push([P, Y]);
+        p.push([END, Y + h * (P - END) / (P - X)]);
+      } else if (D < 0){
+        p.push([END, Y + h * (END - P) / (X - P)]);
+        if (h !== 0){ var x0 = Math.max(P, 0); back.push(pts([[X, Y + h], [x0, Y + h * (x0 - P) / (X - P)]])); }
+      } else p.push([END, Y + h]);
+      var d = pts(p);
+      dRays[0][i].setAttribute('d', d); dRays[1][i].setAttribute('d', d); dRays[2][i].setAttribute('d', d);
+    });
+    $('dioBack').setAttribute('d', back.join(' '));
+    var on = P !== null && P >= 16 && P <= 336, dist = D !== 0 ? 1 / Math.abs(D) : 0, a = Math.abs(D).toFixed(1);
+    ['dioDot','dioDrop','dioLab'].forEach(function(id){ $(id).style.display = on ? '' : 'none'; });
+    if (on){
+      set($('dioDot'), { cx:f(P) }); set($('dioDrop'), { x1:f(P), x2:f(P) });
+      set($('dioLab'), { x:f(clamp(P, 34, 318)) }); $('dioLab').textContent = dist.toFixed(2) + ' m';
+    }
+    $('dioOut').textContent = D === 0 ? '0 D' : signed(D, 1) + ' D';
+    dio.setAttribute('aria-valuetext', D === 0 ? '0 dioptres, no refraction' : say(D, 1) + ' dioptres, ' + (D > 0 ? 'focal distance ' : 'rays spread from a point ') + dist.toFixed(2) + ' metres' + (D > 0 ? '' : ' before the lens'));
+    var lo = +dio.min, hi = +dio.max, pc = (D - lo) / (hi - lo) * 100;
+    dio.style.setProperty('--a', Math.min(pc, 50) + '%'); dio.style.setProperty('--b', Math.max(pc, 50) + '%');
+    $('dioSay').innerHTML = D > 0 ? '+' + a + ' D: focal distance ' + frac('1', a) + ' = ' + dist.toFixed(2) + ' m'
+      : D < 0 ? MINUS + a + ' D: rays spread from a point ' + frac('1', a) + ' = ' + dist.toFixed(2) + ' m before the lens'
+      : '0 D: no refraction';
+  }
+
+  /* ---------- what the eye sees ---------- */
+  function see(m){
+    var mm = Math.abs(m.miss).toFixed(1);
+    if (m.sharp){ $('vTitle').textContent = 'Sharp'; $('vBody').textContent = 'Focus is approximately on the retina.'; }
+    else if (m.miss < 0){ $('vTitle').textContent = 'Blurred'; $('vBody').textContent = 'Focus is about ' + mm + ' mm in front of the retina.'; }
+    else { $('vTitle').textContent = 'Blurred'; $('vBody').textContent = 'Focus is about ' + mm + ' mm behind the retina.'; }
+    var fix = $('fix'), can = !m.sharp && m.p1s >= -10 && m.p1s <= 8 && m.p1s !== m.p1;
+    fix.dataset.can = can ? '1' : '';
+    if (can){ fix.textContent = m.p1s === 0 ? 'Remove the glasses' : 'Correct with ' + signed(m.p1s, 2) + ' D glasses'; fix.dataset.p1 = m.p1s; }
+    var blur = m.sharp ? 0 : Math.min(9, PUPIL_MM * Math.abs(m.miss) / m.dmm * 14);
+    $('chartE').style.filter = blur ? 'blur(' + blur.toFixed(2) + 'px)' : 'none';
+  }
+
+  /* ---------- the vergence panel (short) and the calculations tab (long) ---------- */
+  function k(c, sym, sub){ return '<span class="k' + c + '">' + sym + (sub ? '<sub>' + sub + '</sub>' : '') + '</span>'; }
+  function terms(m){
+    var two = m.two, far = m.u1 === 0, dObj = far ? 0 : 1 / Math.abs(m.u1);
+    var d1 = m.v1 !== 0 ? 1 / m.v1 : 0, d1s = d1 - m.t;
+    return {
+      two:two, far:far, dObj:dObj, d1:d1, d1s:d1s, hasGap:two && m.gap > 0,
+      U1:k(1, 'U', two ? '1' : ''), P1:k(2, 'P', '1'), V1:k(2, 'V', '1'), d1k:k(3, 'd', '1'), U2:k(3, 'U', '2'),
+      P2:k(4, 'P', two ? '2' : ''), V2:k(5, 'V', two ? '2' : ''), d:k(5, 'd', '')
+    };
+  }
+  function eqPanel(m){
+    var far = m.u1 === 0, dObj = far ? 0 : 1 / Math.abs(m.u1);
+    var U = k(1, 'U'), P = k(4, 'P'), V = k(5, 'V'), d = k(5, 'd');
+    var cell = function(c, label, lines, vars){
+      return '<div class="eqc" style="--c:var(--c' + c + ')"><span class="eq-lab">' + label + '</span>' +
+        lines.map(function(x){ return '<span class="eq-line">' + x + '</span>'; }).join('') +
+        '<span class="eq-var">' + vars + '</span></div>';
+    };
+    var res = function(x){ return '<strong>' + x + '</strong>'; };
+    var h = '<p class="eq-def"><b>Vergence</b> is how much light rays are spreading out or coming together, measured in dioptres. Spreading rays are negative, parallel rays are 0 and converging rays are positive.</p>';
+    var obj = far ? '0' : MINUS + frac('1', dObj.toFixed(3) + ' m');
+    h += cell(1, 'Light arriving',
+      m.p1 !== 0 ? [U + ' = ' + obj + ' + ' + par(m.p1, 2) + ' = ' + res(dioTxt(m.u2) + ' D')]
+                 : (far ? [U + ' = ' + res('0 D')] : [U + ' = ' + obj + ' = ' + res(dioTxt(m.u1) + ' D')]),
+      m.p1 !== 0 ? U + ' is the vergence of the light reaching the eye: the light from the object plus the glasses\u2019 power ' + signed(m.p1, 2) + ' D.'
+                 : U + ' is the vergence of the incoming light. ' + (far ? 'Rays from far away are parallel, so it is 0.' : 'Negative because the rays are spreading out.'));
+    h += cell(4, 'Leaving the lens',
+      [V + ' = ' + U + ' + ' + P, '= ' + dioTxt(m.u2) + ' + ' + m.p2.toFixed(2) + ' = ' + res(dioTxt(m.v2) + ' D')],
+      P + ' is the combined power of the cornea and crystalline lens. ' + V + ' is the vergence of the light leaving them.');
+    h += cell(5, 'Focal distance',
+      [V + ' = ' + frac('n', d) + ' so ' + d + ' = ' + frac('n', V),
+       d + ' = ' + frac('1.336', m.v2.toFixed(2) + ' D') + ' \u2248 ' + metres(m) + ' m',
+       metres(m) + ' m \u00d7 1,000 \u2248 ' + res(m.dmm.toFixed(1) + ' mm')],
+      'n = 1.336 is the refractive index inside the eye. A dioptre is 1 per metre, so ' + d + ' comes out in metres; multiplying by 1,000 gives millimetres. ' +
+      'The model retina is ' + m.len.toFixed(1) + ' mm behind the model\u2019s focusing plane.');
+    $('eqs').innerHTML = h;
+  }
+  function metres(m){ return (m.dmm / 1000).toFixed(5); }
+  function maths(m){
+    var far = m.u1 === 0, dObj = far ? 0 : 1 / Math.abs(m.u1);
+    var U = k(1, 'U'), P = k(4, 'P'), V = k(5, 'V'), d = k(5, 'd');
+    var put = function(i, title, math, res, why){
+      var li = $('row' + i);
+      li.querySelector('.row-title').innerHTML = title;
+      li.querySelector('.row-math').innerHTML = math;
+      li.querySelector('.row-num').textContent = res;
+      li.querySelector('.row-why').innerHTML = why;
+    };
+    var obj1 = far ? '0' : MINUS + frac('1', dObj.toFixed(3));
+    put(1, U + ', incoming vergence', m.p1 !== 0 ? U + ' = ' + obj1 + ' + ' + par(m.p1, 2) : U + ' = ' + obj1, dioTxt(m.u2) + ' D',
+      m.p1 !== 0 ? 'With glasses on, the light reaching the eye has the object\u2019s vergence plus the glasses\u2019 power. A minus lens makes the rays spread more. In this simple model the glasses sit right at the eye. ' + (far ? 'Light from a distant object starts at 0.' : 'Light from the object, ' + b(dObj.toFixed(2) + ' m') + ' away, starts at ' + b(dioTxt(m.u1) + ' D') + '.') :
+      far ? 'Rays from a distant object are parallel. They are neither spreading nor converging, so the vergence is zero.'
+          : 'Vergence is one over the distance, in metres, to the point the rays come from. The object is ' + b(dObj.toFixed(2) + ' m') + ' away and the rays spread out from it, so the sign is negative.');
+    put(4, V + ', outgoing vergence', V + ' = ' + U + ' + ' + P + ' = ' + dioTxt(m.u2) + ' + ' + m.p2.toFixed(2), dioTxt(m.v2) + ' D',
+      'A lens adds its power to the vergence arriving at it. The cornea and crystalline lens are treated as one thin lens with combined power ' + P + ' = ' + b(signed(m.p2, 2) + ' D') + '. A positive result means the rays converge.');
+    put(5, d + ', focal distance', d + ' = ' + frac('n', V) + ' = ' + frac('1.336', m.v2.toFixed(2) + ' D') + ' \u2248 ' + metres(m) + ' m', m.dmm.toFixed(1) + ' mm',
+      'Vergence and distance are linked by V = ' + frac('n', 'd') + '. Rearranged for distance, d = ' + frac('n', 'V') + '. ' +
+      'n is the refractive index of what the light travels through: 1 in air, 1.336 inside the eye. A dioptre is 1 per metre, so d comes out in metres: ' +
+      b(metres(m) + ' m') + '. Multiplying by 1,000 converts it to about ' + b(m.dmm.toFixed(1) + ' mm') + '. ' +
+      'Both d and the eye length are measured from the model\u2019s single focusing plane. The model retina is ' + b(m.len.toFixed(1) + ' mm') + ' back, so the image is ' + (m.sharp ? 'approximately sharp.' : 'blurred.'));
+    var n = 0;
+    for (var i = 1; i <= 5; i++){ var li = $('row' + i); if (getComputedStyle(li).display !== 'none'){ n++; li.querySelector('.badge').textContent = n; } }
+  }
+
+  /* ---------- controls ---------- */
+  function outputs(m){
+    $('objOut').textContent = m.u1 === 0 ? 'distant' : (1 / Math.abs(m.u1)).toFixed(2) + ' m';
+    $('p1Out').textContent = m.p1 === 0 ? 'none' : signed(m.p1, 2) + ' D';
+    $('gapOut').textContent = m.gap === 0 ? 'ignored' : m.gap + ' mm';
+    $('p2Out').textContent = signed(m.p2, 1) + ' D';
+    $('lenOut').textContent = m.len.toFixed(1) + ' mm';
+    inputs.obj.setAttribute('aria-valuetext', m.u1 === 0 ? 'Distant object, parallel light' : 'Object ' + (1 / Math.abs(m.u1)).toFixed(2) + ' metres away');
+    inputs.p1.setAttribute('aria-valuetext', m.p1 === 0 ? 'No glasses' : say(m.p1, 2) + ' dioptres');
+    inputs.p2.setAttribute('aria-valuetext', m.p2.toFixed(1) + ' dioptres');
+    inputs.len.setAttribute('aria-valuetext', m.len.toFixed(1) + ' millimetres, model eye length');
+    inputs.gap.setAttribute('aria-valuetext', m.gap + ' millimetres');
+    Object.keys(inputs).forEach(function(key){
+      var el = inputs[key], lo = +el.min, hi = +el.max, p = (+el.value - lo) / (hi - lo) * 100;
+      if (key === 'p1'){ var zr = (0 - lo) / (hi - lo) * 100; el.style.setProperty('--a', Math.min(p, zr) + '%'); el.style.setProperty('--b', Math.max(p, zr) + '%'); }
+      else { el.style.setProperty('--a', '0%'); el.style.setProperty('--b', p + '%'); }
+    });
+    document.querySelectorAll('[data-preset]').forEach(function(btn){
+      var ps = presets[btn.dataset.preset];
+      var same = Object.keys(ps).every(function(key){ return Math.abs(+inputs[key].value - ps[key]) < 1e-6; });
+      btn.setAttribute('aria-pressed', same ? 'true' : 'false');
+    });
+  }
+  function update(){ var m = model(); last = m; outputs(m); draw(m); see(m); eqPanel(m); maths(m); guideSync(); }
+  function load(vals){ Object.keys(vals).forEach(function(key){ if (inputs[key] && vals[key] != null) inputs[key].value = vals[key]; }); update(); }
+  function read(){ var o = {}; Object.keys(inputs).forEach(function(key){ o[key] = +inputs[key].value; }); return o; }
+
+  Object.keys(inputs).forEach(function(key){
+    inputs[key].addEventListener('input', update);
+    inputs[key].addEventListener('change', function(){ frameBench(false); });
+  });
+  /* while a slider is held, nothing scrolls; any framing waits until it is released */
+  var dragInput = null;
+  document.addEventListener('pointerdown', function(e){ var r = e.target.closest && e.target.closest('input[type=range]');
+    if (r){ dragging = true; dragInput = r; document.documentElement.classList.add('dragging'); if (hintEl) hintEl.hidden = true; } });
+  ['pointerup','pointercancel'].forEach(function(t){ window.addEventListener(t, function(){
+    if (!dragging) return; dragging = false; dragInput = null; document.documentElement.classList.remove('dragging'); queueHint();
+    if (pendingFrame){ pendingFrame = false; requestAnimationFrame(frameGuide); }
+  }); });
+  document.querySelectorAll('[data-preset]').forEach(function(btn){
+    btn.addEventListener('click', function(){ load(presets[btn.dataset.preset]); frameBench(true); });
+  });
+  $('fix').addEventListener('click', function(){ inputs.p1.value = $('fix').dataset.p1; update(); frameBench(true); });
+  dio.addEventListener('input', function(){ flags.dio = true; drawDio(); guideSync(); });
+
+  function store(key, val){ try { localStorage.setItem(key, val); } catch (e) {} }
+  function recall(key){ try { return localStorage.getItem(key); } catch (e) { return null; } }
+  var partsBtn = $('partsBtn'), pause = $('pause');
+  partsBtn.addEventListener('click', function(){ partsOn = !partsOn; guideSync(); });
+  function setPaused(on){
+    document.body.classList.toggle('is-paused', on);
+    pause.setAttribute('aria-pressed', on ? 'true' : 'false');
+    pause.textContent = on ? 'Resume motion' : 'Pause motion';
+  }
+  pause.addEventListener('click', function(){ var on = !document.body.classList.contains('is-paused'); setPaused(on); store('eye-paused', on ? '1' : '0'); });
+
+  /* ---------- guided routes: one new thing per step, and only that thing unlocked ---------- */
+  var ARROW = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M12 6l6 6-6 6"/></svg>';
+  var TICK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.500 4.500L19 7.500"/></svg>';
+  var BASE = { obj:24, p1:0, gap:0, p2:60, len:22.3 };
+  var LONG = { obj:24, p1:0, gap:0, p2:60, len:24 };
+  var SHORT = { obj:24, p1:0, gap:0, p2:60, len:21 };
+  var NEXT = 'Press <b>Next</b>.';
+  var FREE_KEYS = ['presets','parts','sees','dio','adv','fP2','fLen','more','mathsBtn','eqs','labels','fix'];
+  var ROUTE_NAMES = { myopia:'Distant things look blurry', close:'Close things look blurry', basics:'Both or not sure', full:'Full guided tour', free:'Exploring freely' };
+  var STEP_SIDE = { title:'Side view of an eye', text:'Light enters from a distant object on the left.', task:NEXT, state:BASE };
+  var STEP_ANAT = { title:'Anatomy', text:'The <b>cornea</b> and <b>lens</b> refract light. The <b>retina</b> at the back receives the image.', task:NEXT, state:BASE, reveal:['labels'] };
+  var STEP_ACC = { title:'Accommodation',
+      text:'The eye focuses by reshaping its lens. This is called accommodation.',
+      task:function(){ return flags.up && !flags.down ? 'Now drag <b>Combined eye power</b> down to 58 D or less.'
+                           : flags.down && !flags.up ? 'Now drag <b>Combined eye power</b> up to 62 D or more.'
+                           : '<b>Drag Combined eye power</b> up to 62 D, then down to 58 D.'; },
+      after:'The ciliary muscle contracts, the zonules slacken and the lens thickens, raising its power. Too much or too little power blurs the image.',
+      allow:['p2'], target:'fP2', state:BASE, reveal:['fP2'], sticky:true,
+      done:function(m){ if (m.p2 >= 62) flags.up = true; if (m.p2 <= 58) flags.down = true; return !!(flags.up && flags.down); },
+      mathsNote:'Raising P raises V = U + P, so d = ' + frac('n', 'V') + ' gets shorter.' };
+  var LOST_SHARP = function(m){ return 'You found a sharp setting earlier. At the current setting the focus is about ' + Math.abs(m.miss).toFixed(1) + ' mm ' +
+      (m.miss < 0 ? 'in front of' : 'behind') + ' the retina, so the image is blurred again. Move the slider back, or press <b>Next</b>.'; };
+  var LOST = 'You completed this step earlier. The settings have changed since, so the drawing no longer matches this description.';
+  var D_NOTE = frac('1.336', '60 D') + ' \u2248 0.02227 m, and 0.02227 \u00d7 1,000 \u2248 22.3 mm';
+  var FINISH = 'Choose an option, or press <b>Finish</b> to explore freely.';
+  var routes = {
+    full: [
+      STEP_SIDE, STEP_ANAT,
+      { title:'Normal focus', text:'The light converges on the retina, so the image is sharp.', task:NEXT, state:BASE, reveal:['sees'] },
+      STEP_ACC,
+      { title:'Dioptres', text:'Lens power is measured in dioptres, written D. The Dioptres card shows a single lens in air.', task:'<b>Drag Lens power</b> and note the focal distance.',
+        after:'For a lens in air, dioptres = ' + frac('1', 'focal distance in m') + '. Doubling the dioptres halves the distance.',
+        allow:['dio'], target:'fDio', state:BASE, reveal:['dio'], sticky:true, done:function(){ return !!flags.dio; } },
+      { title:'Vergence', maths:true,
+        text:'<b>Vergence</b> says how much rays spread out (negative) or come together (positive); parallel light is 0. Incoming vergence <b>U</b> plus the eye’s power <b>P</b> gives the outgoing vergence <b>V = U + P</b>, here 0 + 60 = +60 D.',
+        task:'Find U, P and V on the picture and in the calculations below, then press Next.', target:'eqs', state:BASE, reveal:['eqs','mathsBtn'] },
+      { title:'Focal distance', text:'Vergence sets the focal distance: V = ' + frac('n', 'd') + ', so d = ' + frac('n', 'V') + '. Inside the eye n = 1.336, so d = ' + D_NOTE + ', approximately where the model retina sits.', task:NEXT, state:BASE },
+      { title:'Near-sightedness', text:'This example models axial myopia, where the eye is too long for its focusing power.', task:'<b>Drag Eye length</b> up to 24 mm.',
+        after:'d is still about 22.3 mm, but the retina is further back. The rays spread out again before reaching it, so distant objects blur.',
+        lost:function(m){ return 'You lengthened the eye earlier. It is now ' + m.len.toFixed(1) + ' mm, so this description no longer matches the drawing. Drag it back to 24 mm, or press <b>Next</b>.'; },
+        allow:['len'], target:'fLen', state:BASE, reveal:['fLen'], done:function(m){ return m.len >= 23.9; } },
+      { title:'Near vision', text:'A myopic eye can still focus on near objects.', task:'<b>Drag Object</b> closer until the image is sharp.',
+        after:'Light from a near object arrives diverging, so U is negative, V is smaller and d is longer. In this model the eye focuses no further than about 0.24 m, its far point.',
+        lost:LOST_SHARP, allow:['obj'], target:'fObj', state:LONG, reveal:['fObj'], done:function(m){ return m.sharp && m.k < 24; } },
+      { title:'Free exploration', text:'All controls are unlocked. <b>Calculations</b> below explains each step in more depth.', task:'Press <b>Finish</b>.', allow:'all',
+        actions:[{ label:'Choose another example', go:'intro' }] }
+    ],
+    myopia: [
+      { title:'Normal focus', text:'A side view of an eye looking at something far away on the left. The <b>cornea</b> and <b>lens</b> bend the light to a focus on the <b>retina</b> at the back, so the image is sharp.',
+        task:NEXT, state:BASE, reveal:['labels','sees','eqs','mathsBtn'],
+        mathsNote:'The eye adds +60 D, so d = ' + D_NOTE + ', which matches the model retina.' },
+      { title:'Focus in front of the retina', text:'In myopia, or near-sightedness, the eyeball is usually a little too long. This example models that axial type.',
+        task:'Press <b>Near-sighted</b> above the eye.',
+        after:'The focus is still about 22.3 mm in, but the retina is now 24.0 mm back. The light spreads out again before it lands, so distant things look blurry.',
+        allow:['preNear'], target:'preNear', state:BASE, reveal:['presets'], done:function(m){ return m.len >= 23.9; },
+        mathsNote:'The focal distance d has not changed. Only the retina has moved.' },
+      { title:'Correcting with a minus lens', text:'Glasses for myopia use a minus lens, which spreads the light slightly before it enters the eye.',
+        task:'Press the <b>Correct with glasses</b> button.',
+        after:'The minus lens lowers the total power, moving the focus back to approximately the retina. The image is sharp again.',
+        allow:['fix'], target:'fix', state:LONG, reveal:['fix'], done:function(m){ return m.sharp && m.p1 < 0; },
+        mathsNote:'The glasses make U negative, so V = U + P is smaller and d = ' + frac('n', 'V') + ' is longer.' },
+      { title:'Where next', text:'That is the core idea of myopia. The full tour adds accommodation, dioptres and near vision.', task:FINISH, allow:'all',
+        actions:[{ label:'Take the full guided tour', go:'full' }, { label:'Choose another example', go:'intro' }] }
+    ],
+    close: [
+      { title:'Blur up close', text:'This compares hyperopia (far-sightedness) with myopia. Close blur has more than one cause, so this is a general example, not an explanation of anyone’s own eyes.',
+        task:NEXT, state:BASE, reveal:['labels','cmp'] },
+      { title:'Focus behind the retina', text:'In hyperopia the eye is usually too short, or has too little power for its length. With the eye relaxed, light would focus behind the retina.',
+        task:NEXT, state:SHORT, reveal:['sees','eqs','mathsBtn'],
+        mathsNote:'d = ' + D_NOTE + ', but the model retina is at 21.0 mm, so the focus would land behind it.' },
+      { title:'Accommodation can compensate', text:'Accommodation means the inner lens changing shape to add focusing power.',
+        task:'<b>Drag Combined eye power</b> up until the letters are sharp.',
+        after:'Extra power pulls the focus forward onto the retina, so young eyes can hide some hyperopia. Close objects need even more power, so near work may blur or strain the eyes, more so with age.',
+        lost:LOST_SHARP, allow:['p2'], target:'fP2', state:SHORT, reveal:['fP2'], done:function(m){ return m.sharp && m.p2 > 60; },
+        mathsNote:'Raising P raises V = U + P, so d = ' + frac('n', 'V') + ' gets shorter.' },
+      { title:'Where next', text:'Hyperopia is usually corrected with plus lenses, which add focusing power. The comparison card sets the two side by side.', task:FINISH, allow:'all',
+        actions:[{ label:'Try the myopia example', go:'myopia' }, { label:'Choose another example', go:'intro' }] }
+    ],
+    basics: [
+      STEP_SIDE, STEP_ANAT,
+      { title:'Normal focus', text:'The light converges on the retina, so the image is sharp.', task:NEXT, state:BASE, reveal:['sees','eqs','mathsBtn'],
+        mathsNote:'The eye adds +60 D, so d = ' + D_NOTE + ', which matches the model retina.' },
+      STEP_ACC,
+      { title:'Where next', text:'Those are the basics of focus. The myopia example shows what happens when the eye is too long.', task:FINISH, allow:'all', state:BASE,
+        actions:[{ label:'Continue to the myopia example', go:'myopia' }, { label:'Close blur example', go:'close' }, { label:'Full guided tour', go:'full' }] }
+    ]
+  };
+  var route = 'free', steps = routes.full, gi = 0, gDone = false, gTarget = null, guideOn = false;
+  var mathsOn = false, moreOn = false, pendingRoute = null;
+  var panelSim = $('panelSim');
+
+  function isFree(){ return !guideOn || steps[gi].allow === 'all'; }
+  function keysNow(){
+    var k;
+    if (isFree()){
+      k = FREE_KEYS.slice();
+      if (moreOn) k.push('fObj', 'fP1');
+      if (route === 'close') k.push('cmp');
+    } else {
+      k = [];
+      for (var i = 0; i <= gi; i++) (steps[i].reveal || []).forEach(function(x){ k.push(x); });
+    }
+    return k;
+  }
+  function guideSync(){
+    var m = last;
+    if (!m) return;
+    var keys = keysNow(), has = function(x){ return keys.indexOf(x) >= 0; };
+    document.querySelectorAll('[data-g]').forEach(function(el){ el.hidden = !has(el.dataset.g); });
+    var eqAvail = has('eqs');
+    $('eqs').hidden = !(eqAvail && mathsOn);
+    bench.classList.toggle('no-nums', !(eqAvail && mathsOn));
+    $('mathsBtn').textContent = mathsOn ? 'Hide calculations' : 'Show calculations';
+    $('mathsBtn').setAttribute('aria-expanded', mathsOn ? 'true' : 'false');
+    $('calcNote').hidden = mathsOn;
+    $('moreBtn').textContent = moreOn ? 'Fewer controls' : 'More controls: object distance and glasses';
+    $('moreBtn').setAttribute('aria-expanded', moreOn ? 'true' : 'false');
+    var showParts = isFree() ? partsOn : has('labels');
+    bench.classList.toggle('no-parts', !showParts);
+    partsBtn.setAttribute('aria-pressed', showParts ? 'true' : 'false');
+    $('fix').hidden = !$('fix').dataset.can || !has('fix');
+    bench.classList.toggle('no-glasses', m.p1 === 0);
+    var s = steps[gi], all = isFree(), allow = (guideOn && s.allow) || [];
+    document.querySelectorAll('[data-ctl]').forEach(function(el){
+      var locked = !all && allow.indexOf(el.dataset.ctl) < 0;
+      el.disabled = locked;
+      var fld = el.closest('.field'); if (fld) fld.classList.toggle('is-locked', locked);
+    });
+    document.querySelector('.layout').classList.toggle('dio-first', guideOn && s.target === 'fDio');
+    if (!guideOn){ setTarget(null); return; }
+    var was = gDone;
+    if (s.done){ if (!gDone && s.done(m)) gDone = true; } else gDone = true;
+    var task = typeof s.task === 'function' ? s.task(m) : s.task, say2 = task;
+    if (s.done && gDone){
+      var holds = s.sticky || s.done(m);
+      say2 = holds ? (s.after || task) : (s.lost ? s.lost(m) : LOST);
+    }
+    /* while a slider is held, keep it exactly under the finger even if the text above changes height */
+    var pin = dragging && dragInput, pinY = pin ? dragInput.getBoundingClientRect().top : 0;
+    $('gDo').innerHTML = (s.done && gDone ? TICK : ARROW) + '<span>' + say2 + '</span>';
+    if (pin){ var dy = dragInput.getBoundingClientRect().top - pinY; if (Math.abs(dy) > 0.5) window.scrollBy(0, dy); }
+    /* completion text changes the guide's height: reframe, but never while a slider is held */
+    if (s.done && gDone && !was && !guideFresh){ if (dragging) pendingFrame = true; else requestAnimationFrame(frameGuide); }
+    queueHint();
+    $('gNext').disabled = !gDone;
+    var t = gDone ? 'gNext' : s.target;
+    setTarget(t ? $(t) : null);
+  }
+  function setTarget(el){
+    if (el === gTarget) return;
+    if (gTarget) gTarget.classList.remove('is-target');
+    if (el) el.classList.add('is-target');
+    gTarget = el;
+  }
+  /* keep the current instruction, its buttons and the eye on screen together; if the step's
+     control sits lower down, bring it up only as far as the top of the instruction allows */
+  function frameGuide(){
+    if (!guideOn || panelSim.classList.contains('at-intro') || panelSim.hidden) return;
+    var vh = window.innerHeight, g = $('guide').getBoundingClientRect();
+    var nav = document.querySelector('.guide-nav').getBoundingClientRect(), c = document.querySelector('.bench-scroll').getBoundingClientRect();
+    var lo = Math.max(c.bottom, nav.bottom) - vh + 8, hi = g.top - 8;
+    var t = steps[gi].target ? $(steps[gi].target) : null;
+    if (t && t.id !== 'gNext' && !gDone && t.offsetParent){
+      var need = t.getBoundingClientRect().bottom - vh + 16;   // same rule whether or not it is on screen now, so repeat framings agree
+      if (need <= hi) lo = Math.max(lo, need);
+      else {                                            // keep the task line (what to do) on screen, scroll the explanation above it away
+        var task = $('gDo').getBoundingClientRect().top - 8;
+        if (need <= task){ lo = need; hi = need; }
+      }
+    }
+    if (lo > hi){                                      // guide plus eye do not fit: keep Back/Next on screen, letting the step title scroll away
+      var navNeed = nav.bottom - vh + 8, taskTop = $('gDo').getBoundingClientRect().top - 8;
+      if (navNeed > hi && navNeed <= Math.max(hi, taskTop)) { lo = navNeed; hi = navNeed; }
+    }
+    var d = lo > hi ? hi : Math.min(Math.max(0, lo), hi);
+    /* scroll to an absolute position, so two framings in quick succession agree instead of adding up */
+    if (Math.abs(d) > 4) window.scrollTo({ top:Math.max(0, Math.round(window.scrollY + d)), behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+    setTimeout(queueHint, 450);
+  }
+  /* any change in the guide's height after a step starts (success text, "completed earlier" text, partial progress)
+     reframes once; while a slider is held it waits for release */
+  var lastGH = 0, ghT = null;
+  if (window.ResizeObserver) new ResizeObserver(function(){
+    var h = guide.offsetHeight; if (!h || h === lastGH) return;
+    var first = !lastGH; lastGH = h; if (first || guideFresh || !guideOn) return;
+    clearTimeout(ghT); ghT = setTimeout(function(){ if (dragging) pendingFrame = true; else frameGuide(); }, 120);
+  }).observe(guide);
+  /* where the sliders and the glasses button live: under the diagram on desktop (fix in the sees card),
+     right under the eye on portrait phones, and in a column beside the eye on landscape phones */
+  var mqNarrow = window.matchMedia('(max-width:860px)'), mqLand = window.matchMedia('(orientation:landscape) and (max-height:500px) and (min-width:560px)');
+  var fieldsEl = document.querySelector('.fields'), moreEl = $('moreBtn'), fixEl = $('fix'), seesEl = $('sees'), sideCtl = $('sideCtl');
+  var placed = '';
+  function placeControls(){
+    var mode = mqLand.matches ? 'land' : mqNarrow.matches ? 'narrow' : 'wide';
+    if (mode === placed) return; placed = mode;
+    if (mode === 'land'){ sideCtl.append(fieldsEl, moreEl, fixEl); sideCtl.hidden = false; }
+    else {
+      sideCtl.hidden = true;
+      if (mode === 'narrow'){ $('benchView').after(fixEl); fixEl.after(fieldsEl); fieldsEl.after(moreEl); }
+      else { $('eqs').after(fieldsEl); fieldsEl.after(moreEl); seesEl.appendChild(fixEl); }
+    }
+  }
+  placeControls();
+  [mqNarrow, mqLand].forEach(function(mq){ (mq.addEventListener ? mq.addEventListener('change', onLayout) : mq.addListener(onLayout)); });
+  function onLayout(){ placeControls(); requestAnimationFrame(function(){ frameBench(true); if (!dragging) frameGuide(); updateHint(); }); }
+
+  /* the "where next" button: points to the step's control, or to Next once the task is done, when it is off screen */
+  var hintEl = $('nextHint'), hintFor = null, hintRaf = 0;
+  function hintTarget(){
+    if (!guideOn || panelSim.hidden || panelSim.classList.contains('at-intro')) return null;
+    var s = steps[gi];
+    if (!gDone && s.target && s.target !== 'gNext'){
+      var el = $(s.target); if (!el || el.hidden || !el.offsetParent) return null;
+      var lab = el.querySelector && el.querySelector('label');
+      return { el:el, text: lab ? lab.textContent : el.textContent.trim() };
+    }
+    return { el:$('gNext'), text: gi === steps.length - 1 ? 'Finish' : 'Next step' };
+  }
+  function updateHint(){
+    hintRaf = 0;
+    var h = hintTarget();
+    if (!h || dragging){ hintEl.hidden = true; hintFor = null; return; }
+    var r = h.el.getBoundingClientRect(), vh = window.innerHeight;
+    var below = r.top > vh - 24, above = r.bottom < 24;
+    if (!below && !above){ hintEl.hidden = true; hintFor = null; return; }
+    hintFor = h.el;
+    $('nextHintText').textContent = h.text;
+    hintEl.classList.toggle('up', above);
+    hintEl.setAttribute('aria-label', (above ? 'Scroll up to ' : 'Scroll down to ') + h.text);
+    hintEl.hidden = false;
+  }
+  function queueHint(){ if (!hintRaf) hintRaf = requestAnimationFrame(updateHint); }
+  window.addEventListener('scroll', queueHint, { passive:true });
+  window.addEventListener('resize', queueHint);
+  hintEl.addEventListener('click', function(){
+    var el = hintFor; if (!el) return;
+    el.scrollIntoView({ block:'center', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+    var f = el.matches('button, input') ? el : el.querySelector('input, button');
+    if (f && !f.disabled) f.focus({ preventScroll:true });
+    hintEl.hidden = true;
+  });
+
+  /* horizontal framing of the drawing on narrow screens: always keep the focus and the retina in view,
+     then add the glasses, the retina label and the front-of-eye labels if they fit */
+  var benchScroll = $('benchScroll'), benchView = $('benchView'), pendingFrame = false, guideFresh = false;
+  function frameBench(full){
+    var sc = benchScroll;
+    if (!sc || !last || panelSim.hidden || panelSim.classList.contains('at-intro')) { edgeHints(); return; }
+    var nowNarrow = sc.scrollWidth > sc.clientWidth + 4;
+    if (nowNarrow !== narrow){ narrow = nowNarrow; update(); }
+    var m = last;
+    var W = sc.scrollWidth, cw = sc.clientWidth;
+    if (!cw || W <= cw + 4){ sc.scrollLeft = 0; edgeHints(); return; }
+    var u = W / 920, V = cw / u;                       // visible width in drawing units
+    var rx = EX + m.len * SC, fx = Math.min(EX + m.dmm * SC, 908);
+    var PAD = 22 / u;                                 // keep the focus, retina and labels clear of the edge fades
+    var lo = Math.min(rx, fx) - PAD, hi = Math.max(rx, fx) + PAD;
+    var x0 = sc.scrollLeft / u;
+    var labels = !bench.classList.contains('no-parts');
+    var bb = function(i){ try { var r = parts[i].text.getBBox(); return [r.x, r.x + r.width]; } catch (e) { return null; } };
+    var box = function(el){ try { var r = el.getBBox(); return r.width ? [r.x, r.x + r.width] : null; } catch (e) { return null; } };
+    var want = [];
+    if (m.p1 !== 0){ var G = (narrow ? 120 : 226) + m.gap * 3; want.push([EX - G - 64, null]); }
+    if (!bench.classList.contains('no-nums')){        // calculations open: the U label and the two rulers come next
+      var ml = [box($('eqA')), box($('tDimF')), box($('tDimR'))].filter(Boolean).map(function(r){ return r[0]; });
+      if (ml.length) want.push([Math.min.apply(null, ml) - 16 / u, null]);
+    }
+    if (labels){
+      var rl = bb(6); if (rl) want.push([null, rl[1] + PAD]);
+      var cl = bb(0), il = bb(1); if (cl && il) want.push([Math.min(cl[0], il[0]) - PAD, null]);
+      var ol = bb(7); if (ol) want.push([null, ol[1] + PAD]);
+    }
+    want.push([EX - 30, null]);
+    var stop = false;                                 // in priority order; stop at the first item that does not fit
+    want.forEach(function(w){
+      if (stop) return;
+      var nlo = w[0] != null ? Math.min(lo, w[0]) : lo, nhi = w[1] != null ? Math.max(hi, w[1]) : hi;
+      if (nhi - nlo <= V){ lo = nlo; hi = nhi; } else stop = true;
+    });
+    /* after a slider is released, move only if something that should be visible has left the view */
+    if (!full && lo >= x0 - 1 && hi <= x0 + V + 1){ edgeHints(); return; }
+    var start = clamp(hi - V, 0, 920 - V);            // right-align, so spare room shows the incoming light
+    if (start > lo) start = clamp(lo, 0, 920 - V);
+    sc.scrollLeft = Math.round(start * u);
+    edgeHints();
+  }
+  function edgeHints(){
+    var sc = benchScroll; if (!sc || !benchView) return;
+    var more = sc.scrollWidth > sc.clientWidth + 4;
+    benchView.classList.toggle('more-left', more && sc.scrollLeft > 6);
+    benchView.classList.toggle('more-right', more && sc.scrollLeft < sc.scrollWidth - sc.clientWidth - 6);
+  }
+  benchScroll.addEventListener('scroll', edgeHints, { passive:true });
+  var lastW = 0, rsT = null;
+  function onResize(){
+    var sc = benchScroll, nowNarrow = sc.scrollWidth > sc.clientWidth + 4;
+    if (nowNarrow !== narrow){ narrow = nowNarrow; if (last) update(); }
+    frameBench(true);
+    clearTimeout(rsT);
+    rsT = setTimeout(function(){ if (!dragging) frameGuide(); }, 180);
+  }
+  if (window.ResizeObserver) new ResizeObserver(function(){
+    var w = benchScroll.clientWidth; if (w === lastW) return; lastW = w; onResize();
+  }).observe(benchScroll);
+  else window.addEventListener('resize', onResize);
+  function renderText(){
+    var s = steps[gi];
+    $('gText').innerHTML = s.text + (mathsOn && s.mathsNote ? '<span class="g-maths">' + s.mathsNote + '</span>' : '');
+  }
+  function guideShow(i, fresh){
+    gi = clamp(i, 0, steps.length - 1); gDone = false; flags = {}; guideFresh = true;
+    document.querySelectorAll('.step-ctl').forEach(function(e){ e.classList.remove('step-ctl'); });
+    if (steps[gi].target && $(steps[gi].target)) $(steps[gi].target).classList.add('step-ctl');
+    var s = steps[gi];
+    if (s.maths) mathsOn = true;
+    $('gCount').textContent = 'Step ' + (gi + 1) + ' of ' + steps.length;
+    $('gTitle').textContent = s.title;
+    renderText();
+    $('gActs').innerHTML = (s.actions || []).map(function(a){ return '<button class="gbtn" type="button" data-go="' + a.go + '">' + a.label + '</button>'; }).join('');
+    $('gBack').disabled = gi === 0;
+    $('gNext').textContent = gi === steps.length - 1 ? 'Finish' : 'Next';
+    $('gBar').style.width = ((gi + 1) / steps.length * 100) + '%';
+    if (fresh && s.state) load(s.state); else guideSync();
+    guideFresh = false;
+    frameBench(true);
+    requestAnimationFrame(frameGuide);
+  }
+  $('gActs').addEventListener('click', function(e){ var b = e.target.closest('[data-go]'); if (b) startRoute(b.dataset.go); });
+
+  /* ---------- route selector (answers are not stored) ---------- */
+  function showIntro(screen){
+    panelSim.classList.add('at-intro');
+    $('intro1').hidden = screen !== 1; $('intro2').hidden = screen !== 2;
+    setTarget(null); queueHint();
+    var h = $(screen === 1 ? 'iTitle' : 'iTitle2'); if (h) h.focus({ preventScroll:true });
+    window.scrollTo(0, 0);
+  }
+  function startRoute(r){
+    if (r === 'intro'){ showIntro(1); return; }
+    panelSim.classList.remove('at-intro');
+    route = r; steps = routes[r]; guideOn = true; guide.hidden = false; moreOn = false;
+    $('routeName').textContent = ROUTE_NAMES[r];
+    window.scrollTo(0, 0);
+    guideShow(0, true);
+    $('gTitle').focus({ preventScroll:true });
+  }
+  function startFree(){
+    panelSim.classList.remove('at-intro');
+    if (route !== 'close') route = 'free';
+    guideOn = false; guide.hidden = true;
+    $('routeName').textContent = ROUTE_NAMES.free;
+    document.querySelectorAll('.step-ctl').forEach(function(e){ e.classList.remove('step-ctl'); });
+    setTarget(null); update(); frameBench(true); queueHint();
+    $('routeNow').focus({ preventScroll:true });
+  }
+  document.querySelectorAll('[data-route]').forEach(function(btn){
+    btn.addEventListener('click', function(){ pendingRoute = btn.dataset.route; showIntro(2); });
+  });
+  document.querySelectorAll('[data-maths]').forEach(function(btn){
+    btn.addEventListener('click', function(){ mathsOn = btn.dataset.maths === '1'; startRoute(pendingRoute || 'basics'); });
+  });
+  $('iBack').addEventListener('click', function(){ showIntro(1); });
+  $('iSkip').addEventListener('click', function(){ route = 'free'; startFree(); });
+  $('iSkip2').addEventListener('click', function(){ route = 'free'; startFree(); });
+  $('rChange').addEventListener('click', function(){ showIntro(1); });
+  $('rFull').addEventListener('click', function(){ startRoute('full'); });
+  $('mathsBtn').addEventListener('click', function(){ mathsOn = !mathsOn; if (guideOn) renderText(); guideSync(); });
+  $('moreBtn').addEventListener('click', function(){ moreOn = !moreOn; guideSync(); });
+  /* a Next or Back that becomes disabled would drop keyboard focus: move it to the step title instead */
+  function keepFocus(btn){ if (btn.disabled) $('gTitle').focus({ preventScroll:true }); }
+  $('gNext').addEventListener('click', function(){ if (gi === steps.length - 1) startFree(); else { guideShow(gi + 1, true); keepFocus($('gNext')); } });
+  $('gBack').addEventListener('click', function(){ guideShow(gi - 1, true); keepFocus($('gBack')); });
+  $('gClose').addEventListener('click', function(){ startFree(); });
+
+  /* ---------- start ---------- */
+  function start(saved){
+    var pref = recall('eye-paused');   /* a visitor who asks for reduced motion starts paused; Resume motion still works */
+    if (pref === '1' || (pref === null && window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches)) setPaused(true);
+    drawDio();
+    if (saved && saved.vals && saved.route){
+      mathsOn = !!saved.maths; moreOn = !!saved.more; inputsFrom(saved.vals);
+      if (saved.route === 'free' || !routes[saved.route] || saved.guideOn === false){ route = saved.route; startFree(); }
+      else { route = saved.route; steps = routes[route]; guideOn = true; guide.hidden = false; panelSim.classList.remove('at-intro'); $('routeName').textContent = ROUTE_NAMES[route]; guideShow(saved.gi || 0, false); update(); }
+    } else {
+      load(BASE);
+      showIntro(1);
+    }
+    narrow = benchScroll.scrollWidth > benchScroll.clientWidth + 4; if (last) update();
+    frameBench(true);
+  }
+  function inputsFrom(vals){ Object.keys(vals).forEach(function(key){ if (inputs[key] && vals[key] != null) inputs[key].value = vals[key]; }); }
+  /* ---------- tabs ---------- */
+  var tabs = [$('tabSim'), $('tabWhy')], panels = [$('panelSim'), $('panelWhy')];
+  function showTab(i, focus){
+    tabs.forEach(function(t, j){
+      var on = j === i;
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+      t.tabIndex = on ? 0 : -1;
+      panels[j].hidden = !on;
+    });
+    if (focus) tabs[i].focus();
+    if (i === 0) requestAnimationFrame(function(){ frameBench(true); });
+    queueHint();
+    try { history.replaceState(null, '', i === 1 ? '#why' : location.pathname + location.search); } catch (e) {}
+  }
+  tabs.forEach(function(t, i){
+    t.addEventListener('click', function(){ showTab(i, false); });
+    t.addEventListener('keydown', function(e){
+      if (e.key === 'ArrowRight' || e.key === 'ArrowLeft'){ e.preventDefault(); showTab(i === 0 ? 1 : 0, true); }
+      else if (e.key === 'Home'){ e.preventDefault(); showTab(0, true); }
+      else if (e.key === 'End'){ e.preventDefault(); showTab(1, true); }
+    });
+  });
+  if (location.hash === '#why') showTab(1, false);
+  document.querySelectorAll('#topics .topic').forEach(function(d){
+    d.addEventListener('toggle', function(){ if (d.open) document.querySelectorAll('#topics .topic').forEach(function(o){ if (o !== d) o.open = false; }); });
+  });
+
+  start({});
+})();
+</script>
+
+</body>
+</html>
